@@ -1,0 +1,8 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: performance-addon-github
+  namespace: openshift-performance-addon
+spec:
+  type: GitHub
+  pathname: https://github.com/alosadagrande/acm-cnf.git
