@@ -6,4 +6,5 @@ resources:
   - performance-namespace.yaml
   - performance-operator-group.yaml
   - performance-subscription.yaml
+  - performance-profile.yaml
 
