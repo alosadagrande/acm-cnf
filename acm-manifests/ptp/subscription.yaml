@@ -26,7 +26,7 @@ metadata:
     apps.open-cluster-management.io/github-path: ${CLUSTER_ID}/operator/ptp/
     apps.open-cluster-management.io/github-branch: stage
 spec:
-  channel: acm-cnf-ptp/channel-ptp-github
+  channel: openshift-ptp/channel-ptp-github
   placement:
     placementRef:
       kind: PlacementRule
