@@ -2,7 +2,6 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfigPool
 metadata:
   name: worker-cnf
-  namespace: openshift-machine-config-operator
   labels:
     machineconfiguration.openshift.io/role: worker-cnf
 spec:
