@@ -7,4 +7,5 @@ resources:
   - base/namespace.yaml
 patchesStrategicMerge:
   - overlays/performance_profile.yaml
+  - overlays/machineconfigpool.yaml
 
