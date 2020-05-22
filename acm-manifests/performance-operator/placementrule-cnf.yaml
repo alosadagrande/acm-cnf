@@ -9,4 +9,4 @@ spec:
   clusterSelector:
     matchExpressions: []
     matchLabels:
-      cnf: "performance"
+      performance: "true"
