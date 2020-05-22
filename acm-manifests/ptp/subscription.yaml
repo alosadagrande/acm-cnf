@@ -1,0 +1,33 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: app-ptp
+  namespace: acm-cnf-ptp
+spec:
+  componentKinds:
+  - group: apps.open-cluster-management.io
+    kind: Subscription
+  descriptor: {}
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - app-ptp
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: ptp-subscription
+  namespace: acm-cnf-ptp
+  labels:
+    app: app-ptp
+  annotations:
+    apps.open-cluster-management.io/github-path: ${CLUSTER_ID}/operator/sctp/
+    apps.open-cluster-management.io/github-branch: stage
+spec:
+  channel: acm-cnf-ptp/channel-ptp-github
+  placement:
+    placementRef:
+      kind: PlacementRule
+      name: placement-ptp
