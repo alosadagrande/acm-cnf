@@ -23,8 +23,8 @@ metadata:
   labels:
     app: acm-performance-addon
   annotations:
-    apps.open-cluster-management.io/github-path: operator/performance/
-    apps.open-cluster-management.io/github-branch: config
+    apps.open-cluster-management.io/github-path: ${CLUSTER_ID}/operator/performance/
+    apps.open-cluster-management.io/github-branch: stage
 spec:
   channel: openshift-performance-addon/performance-addon-github
   placement:
