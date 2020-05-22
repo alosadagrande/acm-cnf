@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - performance-machineconfigpool.yaml
-  - performance-namespace.yaml
   - performance-operator-group.yaml
   - performance-subscription.yaml
+  - performance-default-profile.yaml
 
