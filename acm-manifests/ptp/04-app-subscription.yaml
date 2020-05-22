@@ -23,8 +23,8 @@ metadata:
   labels:
     app: app-ptp
   annotations:
-    apps.open-cluster-management.io/github-path: ${CLUSTER_ID}/operator/ptp/
-    apps.open-cluster-management.io/github-branch: stage
+    apps.open-cluster-management.io/github-path: operator/ptp/
+    apps.open-cluster-management.io/github-branch: config
 spec:
   channel: openshift-ptp/channel-ptp-github
   placement:
