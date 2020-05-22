@@ -2,8 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  - https://github.com/alosadagrande/acm-cnf.git?ref=config
-
+  - github.com/alosadagrande/acm-cnf/cnf20/operator/performance?ref=config
+resources:
+  - base/namespace.yaml
 patchesStrategicMerge:
-  - performance_profile.yaml
+  - overlays/performance_profile.yaml
 
