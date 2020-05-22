@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - 02_operator_group.yaml
   - 03_subscription.yaml
+  - ptp.openshift.io_ptpconfigs_crd.yaml
