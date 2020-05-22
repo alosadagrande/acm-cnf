@@ -3,5 +3,8 @@ kind: Kustomization
 
 bases:
   - github.com/alosadagrande/acm-cnf/operator/ptp/?ref=config
+resources:
+  - ptpconfig-grandmaster.yaml
+  - ptpconfig-slave.yaml
 patchesStrategicMerge: []
 
