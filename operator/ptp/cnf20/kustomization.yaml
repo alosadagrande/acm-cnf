@@ -1,6 +1,6 @@
 namespace: openshift-ptp
 commonLabels:
-- app: acm-alo-ptp
+  app: acm-alo-ptp
 bases:
 - ./../base
 patchesStrategicMerge:
