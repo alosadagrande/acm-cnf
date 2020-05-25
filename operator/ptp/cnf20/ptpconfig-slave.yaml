@@ -5,13 +5,12 @@ metadata:
   namespace: openshift-ptp
 spec:
   profile:
-  - name: "slave"
-    interface: "enp3s0f2"
-    ptp4lOpts: "-s"
-    phc2sysOpts: "-a -r"
+  - interface: enp3s0f2
+    name: slave
+    phc2sysOpts: -a -r
+    ptp4lOpts: -s
   recommend:
-  - profile: "slave"
+  - match:
+    - nodeLabel: ptp/slave
     priority: 4
-    match:
-    - nodeLabel: "ptp/slave"
-
+    profile: slave

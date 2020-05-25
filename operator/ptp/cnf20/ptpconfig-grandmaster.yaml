@@ -5,12 +5,12 @@ metadata:
   namespace: openshift-ptp
 spec:
   profile:
-  - name: "grandmaster"
-    interface: "enp3s0f2"
+  - interface: enp3s0f2
+    name: grandmaster
+    phc2sysOpts: -a -r -r
     ptp4lOpts: ""
-    phc2sysOpts: "-a -r -r"
   recommend:
-  - profile: "grandmaster"
+  - match:
+    - nodeLabel: ptp/grandmaster
     priority: 4
-    match:
-    - nodeLabel: "ptp/grandmaster"
+    profile: grandmaster
