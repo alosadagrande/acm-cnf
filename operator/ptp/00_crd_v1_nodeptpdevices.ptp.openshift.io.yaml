@@ -11,7 +11,6 @@ spec:
     listKind: NodePtpDeviceList
     plural: nodeptpdevices
     singular: nodeptpdevice
-  preserveUnknownFields: true
   scope: Namespaced
   versions:
   - name: v1

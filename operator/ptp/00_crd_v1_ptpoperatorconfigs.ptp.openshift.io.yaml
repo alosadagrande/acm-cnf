@@ -11,7 +11,6 @@ spec:
     listKind: PtpOperatorConfigList
     plural: ptpoperatorconfigs
     singular: ptpoperatorconfig
-  preserveUnknownFields: true
   scope: Namespaced
   versions:
   - name: v1
