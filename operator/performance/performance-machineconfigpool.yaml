@@ -13,4 +13,4 @@ spec:
         values: [worker,worker-cnf]
   nodeSelector:
     matchLabels:
-      node-role.kubernetes.io/worker-cnf: ""
+      node-role.kubernetes.io/worker-tbd: ""
