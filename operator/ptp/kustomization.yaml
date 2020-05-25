@@ -2,6 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - 00_crd_ptp.openshift.io_ptpconfigs_crd.yaml
+  - 00_crd_ptp.openshift.io_nodeptpdevices_crd.yaml
+  - 00_crd_ptp.openshift.io_ptpoperatorconfigs_crd.yaml
+  - 00_crd_ptp-operator.v4.4.0.clusterserviceversion.yaml
   - 01_namespace.yaml
   - 02_operator_group.yaml
   - 03_subscription.yaml
