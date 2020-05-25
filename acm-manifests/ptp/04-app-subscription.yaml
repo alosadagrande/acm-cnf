@@ -23,7 +23,7 @@ metadata:
   labels:
     app: app-ptp
   annotations:
-    apps.open-cluster-management.io/github-path: cnf20/operator/ptp/
+    apps.open-cluster-management.io/github-path: operator/ptp/cnf20/
     apps.open-cluster-management.io/github-branch: stage
 spec:
   channel: openshift-ptp/channel-ptp-github
