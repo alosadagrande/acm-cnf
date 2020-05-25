@@ -5,4 +5,7 @@ bases:
 - ./../base
 patchesStrategicMerge:
 - overlays/namespace.yaml
+- overlays/ptpconfig-grandmaster.yaml
+- overlays/ptpconfig-slave.yaml
+
 
