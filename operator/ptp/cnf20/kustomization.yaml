@@ -2,10 +2,10 @@ namespace: openshift-ptp
 commonLabels:
   - app: acm-alo-ptp
 bases:
-- github.com/alosadagrande/acm-cnf/operator/ptp?ref=config
+- ./../base
 resources:
-- base/ptpconfig-grandmaster.yaml
-- base/ptpconfig-slave.yaml
+- resources/ptpconfig-grandmaster.yaml
+- resources/ptpconfig-slave.yaml
 patchesStrategicMerge:
 - overlays/namespace.yaml
 
