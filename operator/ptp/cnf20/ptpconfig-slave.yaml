@@ -2,7 +2,6 @@ apiVersion: ptp.openshift.io/v1
 kind: PtpConfig
 metadata:
   name: slave
-  namespace: openshift-ptp
 spec:
   profile:
   - interface: enp3s0f2
