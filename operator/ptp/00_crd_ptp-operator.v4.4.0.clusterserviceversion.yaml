@@ -177,11 +177,13 @@ spec:
           verbs:
           - '*'
         - apiGroups:
-          - security.openshift.io
+          - "security.openshift.io"
           resources:
-          - securitycontextconstraints
+          - 'securitycontextconstraints'
           resourcesNames:
-          - privileged
+          - 'privileged'
+          verbs:
+          - 'use'
         serviceAccountName: linuxptp-daemon
       deployments:
       - name: ptp-operator
