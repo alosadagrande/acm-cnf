@@ -5,6 +5,7 @@ resources:
   - 00_crd_v1_nodeptpdevices.ptp.openshift.io.yaml
   - 00_crd_v1_ptpconfigs.ptp.openshift.io.yaml
   - 00_crd_v1_ptpoperatorconfigs.ptp.openshift.io.yaml
+  - 00_crd_ptp-operator.v4.4.0.clusterserviceversion.yaml
   - 01_namespace.yaml
   - 02_operator_group.yaml
   - 03_subscription.yaml
