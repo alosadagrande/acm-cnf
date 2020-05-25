@@ -5,3 +5,4 @@ resources:
   - performance-machineconfigpool.yaml
   - performance-operator-group.yaml
   - performance-subscription.yaml
+  - performance-default-profile.yaml
