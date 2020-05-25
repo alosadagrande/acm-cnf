@@ -3,9 +3,6 @@ commonLabels:
   - app: acm-alo-ptp
 bases:
 - ./../base
-resources:
-- resources/ptpconfig-grandmaster.yaml
-- resources/ptpconfig-slave.yaml
 patchesStrategicMerge:
 - overlays/namespace.yaml
 
