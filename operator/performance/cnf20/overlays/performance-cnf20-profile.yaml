@@ -6,7 +6,7 @@ spec:
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
   cpu:
-    isolated: "8-31"
-    reserved: "0-7"
+    isolated: "5-31"
+    reserved: "0-4"
   realTimeKernel:
     enabled: true
