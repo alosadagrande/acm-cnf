@@ -6,8 +6,8 @@ spec:
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
   cpu:
-    isolated: "1-3"
-    reserved: "0"
+    isolated: "8-31"
+    reserved: "0-7"
   hugepages:
     defaultHugepagesSize: "1G"
   realTimeKernel:
