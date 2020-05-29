@@ -5,5 +5,8 @@ metadata:
 spec:
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
+  cpu:
+    isolated: "8-31"
+    reserved: "0-7"
   realTimeKernel:
     enabled: true
