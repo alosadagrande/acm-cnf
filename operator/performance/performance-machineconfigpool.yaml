@@ -5,7 +5,7 @@ metadata:
   labels:
     machineconfiguration.openshift.io/role: worker-cnf
 spec:
-  paused: true
+  paused: false
   machineConfigSelector:
     matchExpressions:
       - key: machineconfiguration.openshift.io/role
