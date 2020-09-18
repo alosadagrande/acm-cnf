@@ -1,0 +1,15 @@
+apiVersion: ptp.openshift.io/v1
+kind: PtpConfig
+metadata:
+  name: grandmaster
+spec:
+  profile:
+  - interface: eno1
+    name: grandmaster
+    phc2sysOpts: -a -r -r
+    ptp4lOpts: ""
+  recommend:
+  - match:
+    - nodeLabel: ptp/grandmaster
+    priority: 4
+    profile: grandmaster

@@ -1,0 +1,15 @@
+apiVersion: ptp.openshift.io/v1
+kind: PtpConfig
+metadata:
+  name: slave
+spec:
+  profile:
+  - interface: eno1
+    name: slave
+    phc2sysOpts: -a -r
+    ptp4lOpts: -s
+  recommend:
+  - match:
+    - nodeLabel: ptp/slave
+    priority: 4
+    profile: slave
