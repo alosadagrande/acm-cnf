@@ -31,3 +31,4 @@ spec:
     placementRef:
       kind: PlacementRule
       name: ptp-placement
+      apiGroup: apps.open-cluster-management.io

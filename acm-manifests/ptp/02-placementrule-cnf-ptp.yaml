@@ -8,3 +8,5 @@ spec:
    - type: OK
   clusterSelector:
     matchExpressions: []
+    matchLabels:
+      name: "cnf10"
