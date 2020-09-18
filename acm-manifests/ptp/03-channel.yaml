@@ -1,7 +1,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
-  name: channel-ptp-github
+  name: ptp-channel-github
   namespace: openshift-ptp
 spec:
   type: GitHub

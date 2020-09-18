@@ -1,7 +1,7 @@
 apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
-  name: app-ptp
+  name: ptp-app
   namespace: openshift-ptp
 spec:
   componentKinds:
@@ -13,7 +13,7 @@ spec:
     - key: app
       operator: In
       values:
-      - app-ptp
+      - ptp-app
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
@@ -21,13 +21,13 @@ metadata:
   name: ptp-subscription
   namespace: openshift-ptp
   labels:
-    app: app-ptp
+    app: ptp-app
   annotations:
     apps.open-cluster-management.io/github-path: operator/ptp
     apps.open-cluster-management.io/github-branch: config
 spec:
-  channel: openshift-ptp/channel-ptp-github
+  channel: openshift-ptp/ptp-channel-github
   placement:
     placementRef:
       kind: PlacementRule
-      name: placement-ptp
+      name: ptp-placement
