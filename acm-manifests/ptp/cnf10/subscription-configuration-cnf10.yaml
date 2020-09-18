@@ -1,0 +1,16 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: ptp-subscription-cnf10
+  namespace: openshift-ptp
+  labels:
+    app: ptp-app-cnf10
+  annotations:
+    apps.open-cluster-management.io/github-path: operator/ptp/
+    apps.open-cluster-management.io/github-branch: cnf10
+spec:
+  channel: openshift-ptp/ptp-channel-github
+  placement:
+    placementRef:
+      kind: PlacementRule
+      name: ptp-placement-cnf10
