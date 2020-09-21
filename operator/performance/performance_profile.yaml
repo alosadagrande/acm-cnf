@@ -1,7 +1,7 @@
 apiVersion: performance.openshift.io/v1alpha1
 kind: PerformanceProfile
 metadata:
-  name: auto-acm-performance
+  name: performance-acm
 spec:
   spec:
     additionalKernelArgs:
