@@ -1,0 +1,8 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: pao-channel-github
+  namespace: openshift-performance-addon
+spec:
+  type: Git
+  pathname: https://github.com/alosadagrande/acm-cnf.git

@@ -1,0 +1,34 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: pao-app-cnf10
+  namespace: openshift-ptp
+spec:
+  componentKinds:
+  - group: apps.open-cluster-management.io
+    kind: Subscription
+  descriptor: {}
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - pao-app-cnf10
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: pao-subscription-cnf10
+  namespace: openshift-performance-addon
+  labels:
+    app: pao-app-cnf10
+  annotations:
+    apps.open-cluster-management.io/git-path: operator/performance
+    apps.open-cluster-management.io/git-branch: cnf10
+spec:
+  name: pao-subscription-cnf10
+  channel: openshift-performance-addon/pao-channel-github
+  placement:
+    placementRef:
+      kind: PlacementRule
+      name: placement-policy-pao
