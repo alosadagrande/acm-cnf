@@ -1,0 +1,8 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: ptp-channel-github
+  namespace: openshift-ptp
+spec:
+  type: GitHub
+  pathname: https://github.com/alosadagrande/acm-cnf.git
