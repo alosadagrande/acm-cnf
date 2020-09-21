@@ -80,7 +80,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-ptp-subscription
+          name: policy-ptp-operatorconfig
         spec:
           remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
           severity: low
@@ -90,14 +90,14 @@ spec:
           object-templates:
             - complianceType: musthave
               objectDefinition:
-              apiVersion: ptp.openshift.io/v1
-              kind: PtpOperatorConfig
-              metadata:
-                name: default
-                namespace: openshift-ptp
-              spec:
-                 daemonNodeSelector:
-                   node-role.kubernetes.io/worker-cnf: ""
+                apiVersion: ptp.openshift.io/v1
+                kind: PtpOperatorConfig
+                metadata:
+                  name: default
+                  namespace: openshift-ptp
+                spec:
+                  daemonNodeSelector:
+                    node-role.kubernetes.io/worker-cnf: ""             
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding

@@ -46,16 +46,16 @@ spec:
                 apiVersion: operators.coreos.com/v1
                 kind: OperatorGroup
                 metadata:
-                  name: ptp-operators
-                  namespace: openshift-ptp
+                  name: performance-addon-operator
+                  namespace: openshift-performance-addon
                 spec:
                   targetNamespaces:
-                  - openshift-ptp
+                    - openshift-performance-addon
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-ptp-subscription
+          name: policy-pao-subscription
         spec:
           remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
           severity: low
@@ -68,58 +68,35 @@ spec:
                 apiVersion: operators.coreos.com/v1alpha1
                 kind: Subscription
                 metadata:
-                  name: ptp-operator-subscription
-                  namespace: openshift-ptp
+                  name: performance-addon-operator
+                  namespace: openshift-performance-addon
                 spec:
                   channel: "4.5"
-                  installPlanApproval: Automatic
-                  name: ptp-operator
-                  source: "redhat-operators"
+                  name: performance-addon-operator
+                  source: redhat-operators
                   sourceNamespace: openshift-marketplace
-    - objectDefinition:
-        apiVersion: policy.open-cluster-management.io/v1
-        kind: ConfigurationPolicy
-        metadata:
-          name: policy-ptp-operatorconfig
-        spec:
-          remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
-          severity: low
-          namespaceSelector:
-            exclude: ["kube-*"]
-            include: ["*"]
-          object-templates:
-            - complianceType: musthave
-              objectDefinition:
-                apiVersion: ptp.openshift.io/v1
-                kind: PtpOperatorConfig
-                metadata:
-                  name: default
-                  namespace: openshift-ptp
-                spec:
-                  daemonNodeSelector:
-                    node-role.kubernetes.io/worker-cnf: ""             
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-ptp
+  name: binding-policy-pao
 placementRef:
-  name: placement-policy-ptp
+  name: placement-policy-pao
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-ptp-operator
+- name: policy-pao-operator
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-policy-ptp
+  name: placement-policy-pao
 spec:
   clusterConditions:
   - status: "True"
     type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-      - {key: ptp, operator: In, values: ["true"]}
+      - {key: pao, operator: In, values: ["true"]}
