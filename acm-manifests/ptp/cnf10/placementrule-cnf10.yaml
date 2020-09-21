@@ -6,7 +6,7 @@ metadata:
 spec:
   clusterConditions:
   - type: ManagedClusterConditionAvailable
-      status: "True"
+    status: "True"
   clusterSelector:
     matchLabels:
       cluster: "cnf10"
