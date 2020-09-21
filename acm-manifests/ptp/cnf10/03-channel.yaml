@@ -4,5 +4,5 @@ metadata:
   name: ptp-channel-github
   namespace: openshift-ptp
 spec:
-  type: GitHub
+  type: Git
   pathname: https://github.com/alosadagrande/acm-cnf.git
