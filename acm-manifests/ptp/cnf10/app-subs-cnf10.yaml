@@ -26,6 +26,7 @@ metadata:
     apps.open-cluster-management.io/github-path: operator/ptp/
     apps.open-cluster-management.io/github-branch: cnf10
 spec:
+  name: ptp-subscription-cnf10
   channel: openshift-ptp/ptp-channel-github
   placement:
     placementRef:
