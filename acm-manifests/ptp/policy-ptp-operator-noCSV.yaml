@@ -80,7 +80,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-ptp-grandmaster
+          name: policy-ptp-subscription
         spec:
           remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
           severity: low
@@ -90,52 +90,12 @@ spec:
           object-templates:
             - complianceType: musthave
               objectDefinition:
-                apiVersion: ptp.openshift.io/v1
-                kind: PtpConfig
-                metadata:
-                  name: grandmaster
-                  namespace: openshift-ptp
-                spec:
-                  profile:
-                  - name: "grandmaster"
-                    interface: "eno2"
-                    ptp4lOpts: ""
-                    phc2sysOpts: "-a -r -r"
-                  recommend:
-                  - profile: "grandmaster"
-                    priority: 4
-                    match:
-                    - nodeLabel: "node-role.kubernetes.io/master"
-    - objectDefinition:
-        apiVersion: policy.open-cluster-management.io/v1
-        kind: ConfigurationPolicy
-        metadata:
-          name: policy-ptp-slave
-        spec:
-          remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
-          severity: low
-          namespaceSelector:
-            exclude: ["kube-*"]
-            include: ["*"]
-          object-templates:
-            - complianceType: musthave
-              objectDefinition:
-                apiVersion: ptp.openshift.io/v1
-                kind: PtpConfig
-                metadata:
-                  name: ptp-slave-config
-                  namespace: openshift-ptp
-                spec:
-                  profile:
-                  - name: "slave"
-                    interface: "eno1"
-                    ptp4lOpts: "-s"
-                    phc2sysOpts: "-a -r"
-                  recommend:
-                  - profile: "slave"
-                    priority: 4
-                    match:
-                    - nodeLabel: "node-role.kubernetes.io/worker"
+              apiVersion: ptp.openshift.io/v1
+              kind: PtpOperatorConfig
+              metadata:
+                name: default
+                namespace: openshift-ptp
+              spec: {}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
