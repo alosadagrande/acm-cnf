@@ -95,7 +95,9 @@ spec:
               metadata:
                 name: default
                 namespace: openshift-ptp
-              spec: {}
+              spec:
+                 daemonNodeSelector:
+                   node-role.kubernetes.io/worker-cnf: ""
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding

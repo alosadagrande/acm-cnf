@@ -23,8 +23,8 @@ metadata:
   labels:
     app: ptp-app-cnf10
   annotations:
-    apps.open-cluster-management.io/github-path: operator/ptp/
-    apps.open-cluster-management.io/github-branch: cnf10
+    apps.open-cluster-management.io/git-path: operator/ptp
+    apps.open-cluster-management.io/git-branch: cnf10
 spec:
   name: ptp-subscription-cnf10
   channel: openshift-ptp/ptp-channel-github
