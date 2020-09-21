@@ -3,27 +3,26 @@ kind: PerformanceProfile
 metadata:
   name: performance-acm
 spec:
-  spec:
-    additionalKernelArgs:
-    - nmi_watchdog=0
-    - audit=0
-    - mce=off
-    - processor.max_cstate=1
-    - idle=poll
-    - intel_idle.max_cstate=0
-    - nosmt
-    - tsc=reliable
-    cpu:
-      isolated: 3-60
-      reserved: 0-2
-    hugepages:
-      defaultHugepagesSize: 1G
-      pages:
-      - count: 16
-        size: 1G
-    nodeSelector:
-      node-role.kubernetes.io/worker-acm: ""
-    numa:
-      topologyPolicy: best-effort
-    realTimeKernel:
-      enabled: true
+  additionalKernelArgs:
+  - nmi_watchdog=0
+  - audit=0
+  - mce=off
+  - processor.max_cstate=1
+  - idle=poll
+  - intel_idle.max_cstate=0
+  - nosmt
+  - tsc=reliable
+  cpu:
+    isolated: 3-60
+    reserved: 0-2
+  hugepages:
+    defaultHugepagesSize: 1G
+    pages:
+    - count: 8
+      size: 1G
+  nodeSelector:
+    node-role.kubernetes.io/worker-acm: ""
+  numa:
+    topologyPolicy: best-effort
+  realTimeKernel:
+    enabled: true
