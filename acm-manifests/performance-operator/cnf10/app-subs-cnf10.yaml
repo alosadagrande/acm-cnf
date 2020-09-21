@@ -2,7 +2,7 @@ apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
   name: pao-app-cnf10
-  namespace: openshift-ptp
+  namespace: openshift-performance-addon
 spec:
   componentKinds:
   - group: apps.open-cluster-management.io
