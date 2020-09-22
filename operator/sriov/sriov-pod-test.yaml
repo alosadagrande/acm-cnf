@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: sriov-pod-test
-  namespace: sriov-testing
+  namespace: openshift-sriov-network-operator
   annotations:
     k8s.v1.cni.cncf.io/networks: sriov-network
 spec:
