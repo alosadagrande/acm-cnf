@@ -75,6 +75,30 @@ spec:
                   name: sriov-network-operator
                   source: redhat-operators
                   sourceNamespace: openshift-marketplace
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-sriov-operatorconfig
+        spec:
+          remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
+          severity: low
+          namespaceSelector:
+            exclude: ["kube-*"]
+            include: ["*"]
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: sriovnetwork.openshift.io/v1
+                kind: SriovOperatorConfig
+                metadata:
+                  name: default
+                  namespace: openshift-sriov-network-operator
+                spec:
+                  enableInjector: true
+                  enableOperatorWebhook: true
+                  configDaemonNodeSelector:
+                    "node-role.kubernetes.io/worker-cnf": ""
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
