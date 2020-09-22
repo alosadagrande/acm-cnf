@@ -2,7 +2,7 @@ apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
   name: sriov-app-operator
-  namespace: cnf-operators
+  namespace: openshift-sriov-network-operator
 spec:
   componentKinds:
   - group: apps.open-cluster-management.io
@@ -19,7 +19,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
 metadata:
   name: sriov-subscription-operator
-  namespace: cnf-operators
+  namespace: openshift-sriov-network-operator
   labels:
     app: sriov-operator
   annotations:
@@ -27,7 +27,7 @@ metadata:
     apps.open-cluster-management.io/git-branch: cnf10
 spec:
   name: sriov-subscription-operator
-  channel: cnf-operators/cnf-channel-github
+  channel: openshift-sriov-network-operator/cnf-channel-github
   placement:
     placementRef:
       kind: PlacementRule
