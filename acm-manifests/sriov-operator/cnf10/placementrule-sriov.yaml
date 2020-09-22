@@ -9,4 +9,4 @@ spec:
     status: "True"
   clusterSelector:
     matchLabels:
-      sriov: true
+      sriov: "True"
