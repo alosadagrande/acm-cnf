@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sriov-pod-test
+  namespace: sriov-testing
+  annotations:
+    k8s.v1.cni.cncf.io/networks: sriov-network
+spec:
+  containers:
+  - name: podexample
+    image: quay.io/schseba/utility-container:latest
+    command: ["/bin/bash", "-c", "sleep INF"]
