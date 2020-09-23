@@ -3,6 +3,5 @@ kind: Kustomization
 bases:
   - 'github.com/alosadagrande/acm-cnf/operator/sctp/?ref=config'
 resources:
-#  - mcp-worker-cnf.yaml
 patchesStrategicMerge:
   - sctp_module_mc.yaml 
