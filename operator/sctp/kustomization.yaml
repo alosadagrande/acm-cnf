@@ -5,4 +5,4 @@ bases:
 resources:
   - mcp-worker-cnf.yaml
 patchesStrategicMerge:
-  - performance_profile.yaml
+  - sctp_module_mc.yaml 
