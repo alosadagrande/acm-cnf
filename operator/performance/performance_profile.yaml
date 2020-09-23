@@ -1,7 +1,7 @@
 apiVersion: performance.openshift.io/v1alpha1
 kind: PerformanceProfile
 metadata:
-  name: performance-acm
+  name: performance
 spec:
   additionalKernelArgs:
   - nmi_watchdog=0
@@ -18,10 +18,10 @@ spec:
   hugepages:
     defaultHugepagesSize: 1G
     pages:
-    - count: 8
+    - count: 16 
       size: 1G
   nodeSelector:
-    node-role.kubernetes.io/worker-acm: ""
+    node-role.kubernetes.io/worker-cnf: ""
   numa:
     topologyPolicy: best-effort
   realTimeKernel:
