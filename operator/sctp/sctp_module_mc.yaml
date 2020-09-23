@@ -3,3 +3,4 @@ kind: MachineConfig
 metadata:
   labels:
     machineconfiguration.openshift.io/role: worker-cnf
+  name: load-sctp-module
