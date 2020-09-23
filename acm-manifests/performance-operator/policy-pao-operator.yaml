@@ -92,7 +92,7 @@ spec:
                 apiVersion: machineconfiguration.openshift.io/v1
                 kind: MachineConfigPool
                 metadata:
-                  name: worker-acm
+                  name: worker-cnf
                   labels:
                     machineconfiguration.openshift.io/role: worker-cnf
                 spec:
@@ -104,7 +104,7 @@ spec:
                         values: [worker,worker-cnf]
                   nodeSelector:
                     matchLabels:
-                      node-role.kubernetes.io/worker-acm: ""
+                      node-role.kubernetes.io/worker-cnf: ""
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
