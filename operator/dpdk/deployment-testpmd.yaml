@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/component: testpmd
     app.kubernetes.io/instance: testpmd
   name: testpmd
-  namespace: deploy-testpmd
+  namespace: openshift-sriov-network-operator
 spec:
   template:
     metadata:
@@ -27,3 +27,4 @@ spec:
               cpu: "1"
               hugepages-1Gi: 1Gi
               memory: 1000Mi
+          name: testpmd
