@@ -10,7 +10,6 @@ spec:
     ptp4lOpts: "-s"
   recommend:
   - match:
-    - nodeLabel: "node-role.kubernetes.io/worker-cnf"
-      nodeName: "cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com"
+    - nodeName: "cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com"
     priority: 4
     profile: slave
