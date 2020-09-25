@@ -6,7 +6,6 @@ metadata:
     app.kubernetes.io/component: testpmd
     app.kubernetes.io/instance: testpmd
   name: testpmd
-  namespace: deploy-testpmd
 spec:
   replicas: 1
   revisionHistoryLimit: 10
