@@ -31,4 +31,4 @@ spec:
   placement:
     placementRef:
       kind: PlacementRule
-      name: ptp-placement-cnf10
+      name: placement-policy-ptp
