@@ -27,7 +27,7 @@ metadata:
     apps.open-cluster-management.io/git-branch: cnf10
 spec:
   name: dpdk-subscription
-  channel: cnf-operators/cnf-channel-github
+  channel: openshift-sriov-network-operator/cnf-channel-github
   placement:
     placementRef:
       kind: PlacementRule
