@@ -4,7 +4,7 @@ metadata:
   name: grandmaster
 spec:
   profile:
-  - interface: eno1
+  - interface: eno2
     name: grandmaster
     phc2sysOpts: '-a -r -r'
     ptp4lOpts: ''
