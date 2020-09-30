@@ -1,7 +1,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: ptp-placement-cnf10
+  name: stage-clusters 
   namespace: openshift-ptp
 spec:
   clusterConditions:
@@ -9,4 +9,4 @@ spec:
     status: "True"
   clusterSelector:
     matchLabels:
-      cluster: "cnf10"
+      env: "stage"

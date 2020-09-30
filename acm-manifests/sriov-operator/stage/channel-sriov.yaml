@@ -1,8 +1,8 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
-  name: ptp-channel-github
-  namespace: openshift-ptp
+  name: sriov-channel-github
+  namespace: openshift-sriov-network-operator
 spec:
-  type: GitHub
+  type: Git
   pathname: https://github.com/alosadagrande/acm-cnf.git

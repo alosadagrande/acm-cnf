@@ -1,7 +1,7 @@
 apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
-  name: sriov-app-operator
+  name: sriov-app-stage
   namespace: openshift-sriov-network-operator
 spec:
   componentKinds:
@@ -13,7 +13,7 @@ spec:
     - key: app
       operator: In
       values:
-      - sriov-operator
+      - sriov-app-stage
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
@@ -21,14 +21,14 @@ metadata:
   name: sriov-subscription-operator
   namespace: openshift-sriov-network-operator
   labels:
-    app: sriov-operator
+    app: sriov-app-stage
   annotations:
     apps.open-cluster-management.io/git-path: operator/sriov
-    apps.open-cluster-management.io/git-branch: cnf10
+    apps.open-cluster-management.io/git-branch: stage
 spec:
   name: sriov-subscription-operator
-  channel: openshift-sriov-network-operator/cnf-channel-github
+  channel: openshift-sriov-network-operator/sriov-channel-github
   placement:
     placementRef:
       kind: PlacementRule
-      name: sriov-placement
+      name: stage-clusters
