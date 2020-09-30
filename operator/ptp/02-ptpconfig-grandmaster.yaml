@@ -4,12 +4,12 @@ metadata:
   name: grandmaster
 spec:
   profile:
-  - interface: enp3s0f2
+  - interface: eno1
     name: grandmaster
-    phc2sysOpts: -a -r -r
-    ptp4lOpts: ""
+    phc2sysOpts: '-a -r -r'
+    ptp4lOpts: ''
   recommend:
   - match:
-    - nodeLabel: ptp/grandmaster
+    - nodeName: 'cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com'
     priority: 4
     profile: grandmaster

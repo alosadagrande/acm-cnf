@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sriov-pod-test 
+    app.kubernetes.io/component: sriov-pod-test 
+    app.kubernetes.io/instance: sriov-pod-test
+  name: sriov-pod-test
+  namespace: openshift-sriov-network-operator
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: sriov-pod-test
+  template:
+    metadata:
+      labels:
+        app: sriov-pod-test
+      annotations:
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/sriov-network
+    spec:
+      containers:
+        - image: quay.io/schseba/utility-container:latest
+          command:
+          - /bin/bash
+          - -c
+          - sleep INF
+          imagePullPolicy: Always
+          name: podexample

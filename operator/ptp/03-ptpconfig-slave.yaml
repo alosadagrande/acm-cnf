@@ -4,12 +4,12 @@ metadata:
   name: slave
 spec:
   profile:
-  - interface: enp3s0f2
+  - interface: eno1
     name: slave
-    phc2sysOpts: -a -r
-    ptp4lOpts: -s
+    phc2sysOpts: "-a -r"
+    ptp4lOpts: "-s"
   recommend:
   - match:
-    - nodeLabel: ptp/slave
+    - nodeName: "cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com"
     priority: 4
     profile: slave
