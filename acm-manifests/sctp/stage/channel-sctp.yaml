@@ -1,8 +1,8 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
-  name: cnf-channel-github
-  namespace: cnf-operators
+  name: sctp-channel-github
+  namespace: sctp-gitops
 spec:
   type: Git
   pathname: https://github.com/alosadagrande/acm-cnf.git

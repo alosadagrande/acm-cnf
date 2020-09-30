@@ -1,12 +1,12 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: dpdk-placement
-  namespace: openshift-sriov-network-operator 
+  name: stage-clusters 
+  namespace: cnf-gitops 
 spec:
   clusterConditions:
   - type: ManagedClusterConditionAvailable
     status: "True"
   clusterSelector:
     matchLabels:
-      dpdk: "true"
+      env: "stage"
