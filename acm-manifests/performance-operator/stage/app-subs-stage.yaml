@@ -1,7 +1,7 @@
 apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
-  name: pao-app-cnf10
+  name: pao-app-stage
   namespace: openshift-performance-addon
 spec:
   componentKinds:
@@ -13,22 +13,22 @@ spec:
     - key: app
       operator: In
       values:
-      - pao-app-cnf10
+      - pao-app-stage
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
 metadata:
-  name: pao-subscription-cnf10
+  name: pao-subscription-stage
   namespace: openshift-performance-addon
   labels:
-    app: pao-app-cnf10
+    app: pao-app-stage
   annotations:
     apps.open-cluster-management.io/git-path: operator/performance
-    apps.open-cluster-management.io/git-branch: cnf10
+    apps.open-cluster-management.io/git-branch: stage
 spec:
-  name: pao-subscription-cnf10
+  name: pao-subscription-stage
   channel: openshift-performance-addon/pao-channel-github
   placement:
     placementRef:
       kind: PlacementRule
-      name: placement-policy-pao
+      name: stage-clusters

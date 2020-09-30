@@ -1,7 +1,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: performance-addon
+  name: stage-clusters
   namespace: openshift-performance-addon
 spec:
   clusterConditions:
@@ -9,4 +9,4 @@ spec:
   clusterSelector:
     matchExpressions: []
     matchLabels:
-      performance: "true"
+      env: "stage"
