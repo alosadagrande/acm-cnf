@@ -2,7 +2,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: stage-clusters 
-  namespace: openshift-ptp
+  namespace: openshift-performance-addon
 spec:
   clusterConditions:
   - type: ManagedClusterConditionAvailable
