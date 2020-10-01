@@ -9,4 +9,4 @@ spec:
     status: "True"
   clusterSelector:
     matchLabels:
-      env: "stage"
+      environment: "stage"
