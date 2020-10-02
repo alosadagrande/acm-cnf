@@ -13,7 +13,7 @@ spec:
   - nosmt
   - tsc=reliable
   cpu:
-    isolated: 5-35
+    isolated: 5-30
     reserved: 0-4
   hugepages:
     defaultHugepagesSize: 1G
