@@ -10,6 +10,6 @@ spec:
     ptp4lOpts: "-s"
   recommend:
   - match:
-    - nodeName: "cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com"
+    - nodeLabel: ptp/grandmaster
     priority: 4
     profile: slave
