@@ -10,6 +10,6 @@ spec:
     ptp4lOpts: "-s"
   recommend:
   - match:
-    - nodeLabel: ptp/grandmaster
+    - nodeLabel: ptp/slave
     priority: 4
     profile: slave
