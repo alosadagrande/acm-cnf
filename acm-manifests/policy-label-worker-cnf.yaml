@@ -1,0 +1,57 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    apps.open-cluster-management.io/reconcile-option: merge
+  name: policy-stage-tag-worker-cnf
+  namespace: default
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-tag-worker-cnf10
+        spec:
+          remediationAction: enforce
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Node
+                metadata:
+                  labels:
+                    node-role.kubernetes.io/worker-cnf: ""
+                  name: cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com
+          severity: low
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-tag-worker-cnf11
+        spec:
+          remediationAction: enforce
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Node
+                metadata:
+                  labels:
+                    node-role.kubernetes.io/worker-cnf: ""
+                  name: cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com
+          severity: low
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-worker-cnf
+placementRef:
+  name: stage-clusters
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-stage-tag-worker-cnf
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
