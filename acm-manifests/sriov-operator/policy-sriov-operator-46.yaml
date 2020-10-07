@@ -99,6 +99,34 @@ spec:
                   enableOperatorWebhook: true
                   configDaemonNodeSelector:
                     "node-role.kubernetes.io/worker-cnf": ""
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-sriov-operatorconfig
+        spec:
+          remediationAction: inform # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
+          severity: low
+          namespaceSelector:
+            exclude: ["kube-*"]
+            include: ["*"]
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operator.openshift.io/v1
+                kind: Network
+                metadata:
+                  name: cluster
+                spec:
+                  additionalNetworks:
+                  - name: dummy-dhcp-network
+                    simpleMacvlanConfig:
+                      ipamConfig:
+                        type: dhcp
+                      master: eth0
+                      mode: bridge
+                      mtu: 1500
+                    type: SimpleMacvlan
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
