@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   annotations:
     apps.open-cluster-management.io/reconcile-option: merge
-  name: policy-stage-tag-worker-cnf
+  name: policy-clustercnf10-tag-workers
   namespace: default
 spec:
   disabled: false
@@ -12,7 +12,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-tag-worker-cnf10
+          name: policy-clustercnf10-tag-worker-cnf10
         spec:
           remediationAction: enforce
           object-templates:
@@ -23,13 +23,14 @@ spec:
                 metadata:
                   labels:
                     node-role.kubernetes.io/worker-cnf: ""
+                    ptp/grandmaster: ""
                   name: cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com
           severity: low
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-tag-worker-cnf11
+          name: policy-clustercnf10-tag-worker-cnf11
         spec:
           remediationAction: enforce
           object-templates:
@@ -40,18 +41,19 @@ spec:
                 metadata:
                   labels:
                     node-role.kubernetes.io/worker-cnf: ""
+                    ptp/slave: ""
                   name: cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com
           severity: low
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-worker-cnf
+  name: binding-policy-clustercnf10-tag-workers
 placementRef:
-  name: stage-clusters
+  name: cluster-cnf10
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-stage-tag-worker-cnf
+- name: policy-clustercnf10-tag-workers
   kind: Policy
   apiGroup: policy.open-cluster-management.io
