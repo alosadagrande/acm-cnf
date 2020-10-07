@@ -10,6 +10,6 @@ spec:
     ptp4lOpts: ''
   recommend:
   - match:
-    - nodeName: 'cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com'
+    - nodeLabel: ptp/grandmaster
     priority: 4
     profile: grandmaster
