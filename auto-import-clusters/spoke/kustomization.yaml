@@ -1,0 +1,4 @@
+resources:
+- v200_endpoint-crd.yaml
+- v202_klusterlet_config.yaml
+- v204_bootstrap_secret.yaml
