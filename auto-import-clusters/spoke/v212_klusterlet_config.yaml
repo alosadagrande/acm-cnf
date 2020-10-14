@@ -119,17 +119,12 @@ kind: ClusterRole
 metadata:
   labels:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
-  name: open-cluster-management:klusterlet-addon-admin-aggregate-clusterrole
+  name: open-cluster-management:klusterlet-admin-aggregate-clusterrole
 rules:
 - apiGroups:
-  - agent.open-cluster-management.io
+  - operator.open-cluster-management.io
   resources:
-  - applicationmanagers
-  - certpolicycontrollers
-  - iampolicycontrollers
-  - policycontrollers
-  - searchcollectors
-  - workmanagers
+  - klusterlets
   verbs:
   - get
   - list
