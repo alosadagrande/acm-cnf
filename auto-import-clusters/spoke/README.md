@@ -1,18 +1,16 @@
-Please ensure that you properly replace those values in the env.sh script for the proper ones in your environment:
+The easiest way to import a cluster is extracting the CRDs and import information from the HUB cluster itself. **SPOKE_CLUSTER** is the name of the managedCluster resource we created previously.
 
-* SPOKE_CLUSTER
-* DEPLOYMENT_IMAGE
-* KLUSTERLET_REG_IMAGE
-* KLUSTERLET_WORK_IMAGE
-* KUBECONFIG_HUB
+::warning:: This information is created once the managedcluster resource is applied.
 
-Then run the following resources:
+These commands must be executed from the hub cluster:
 
-```sh
-$ source ./env.sh
-$ envsubst < v210_endpoint-crd.yaml | oc apply -f -
-$ envsubst < v212_klusterlet_config.yaml | oc apply -f -
-$ envsubst < v214_bootstrap_secret.yaml | oc apply -f -
+```sh 
+$ oc get secret $SPOKE_CLUSTER-import -o "jsonpath={.data['crds\.yaml']}" -n $SPOKE_CLUSTER | base64 -d > crds.yaml 
+
 ```
 
-NOTE: These resources are based on ACM v2.1. In order to clean the import of a cluster, please execute: https://github.com/ch-stark/acminstall/blob/master/scripts/crc-cleanendpoint
+```sh
+$ oc get secret $SPOKE_CLUSTER-import -o "jsonpath={.data['import\.yaml']}" -n $SPOKE_CLUSTER | base64 -d > import.yaml
+```
+
+Finally, apply crds.yaml and import.yaml manifest in the spoke cluster you want to be imported.

@@ -1,0 +1,238 @@
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: open-cluster-management-agent
+
+---
+apiVersion: v1
+imagePullSecrets:
+- name: open-cluster-management-image-pull-credentials
+kind: ServiceAccount
+metadata:
+  name: klusterlet
+  namespace: open-cluster-management-agent
+
+---
+apiVersion: v1
+data:
+  kubeconfig: $KUBECONFIG_HUB
+kind: Secret
+metadata:
+  name: bootstrap-hub-kubeconfig
+  namespace: open-cluster-management-agent
+type: Opaque
+
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJZV3h2YzJGa1lXYzZka2gxVURRd05ta3pRbEpwVDFKMVUwTTBhR0U1ZGtOYWNTOU9SMFV5WjFONVVURXJiSE5pTW5SWk1VUklXRTEyVkdoME1ISlphRXRKWkU1b1VWQlVUQT09IiwKICAgICAgImVtYWlsIjogIiIKICAgIH0KICB9Cn0=
+kind: Secret
+metadata:
+  name: open-cluster-management-image-pull-credentials
+  namespace: open-cluster-management-agent
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: klusterlet
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  - serviceaccounts
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - ""
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - rolebindings
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - roles
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
+  - patch
+  - delete
+  - escalate
+  - bind
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - operator.open-cluster-management.io
+  resources:
+  - klusterlets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - operator.open-cluster-management.io
+  resources:
+  - klusterlets/status
+  verbs:
+  - update
+  - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  name: open-cluster-management:klusterlet-admin-aggregate-clusterrole
+rules:
+- apiGroups:
+  - operator.open-cluster-management.io
+  resources:
+  - klusterlets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: klusterlet
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: klusterlet
+subjects:
+- kind: ServiceAccount
+  name: klusterlet
+  namespace: open-cluster-management-agent
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: klusterlet
+  name: klusterlet
+  namespace: open-cluster-management-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: klusterlet
+  template:
+    metadata:
+      labels:
+        app: klusterlet
+    spec:
+      containers:
+      - args:
+        - /registration-operator
+        - klusterlet
+        image: quay.io/open-cluster-management/registration-operator@sha256:36f444eb232134a1e94c83dafc848ed82d1b1f8c2ff4148aa8cc83a97deb469d
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 2
+          periodSeconds: 10
+        name: klusterlet
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 2
+      serviceAccountName: klusterlet
+
+---
+apiVersion: operator.open-cluster-management.io/v1
+kind: Klusterlet
+metadata:
+  name: klusterlet
+spec:
+  clusterName: cnf21
+  imagePullSecret: open-cluster-management-image-pull-credentials
+  namespace: open-cluster-management-agent
+  registrationImagePullSpec: quay.io/open-cluster-management/registration@sha256:be41ba10cb03ff4524c7f243db8da7b602ee7b3328459853d8a54c9d2126a6e8
+  workImagePullSpec: quay.io/open-cluster-management/work@sha256:98d9e72801b2cf46c70922cfeab9f1b28b60f9c0d06fc94778b291012ce1a6ac
