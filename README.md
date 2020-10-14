@@ -1,4 +1,4 @@
-# acm-cnf
+# Deploy and configure CNF operators the gitops way with ACM
 
 The idea is to use Advance Cluster Management for Kubernetes (ACM) to automate the installation of the CNF operators and their specific configuration in the target clusters.
 
