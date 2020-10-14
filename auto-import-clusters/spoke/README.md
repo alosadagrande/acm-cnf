@@ -1,14 +1,18 @@
-Apply those manifests on the cluster that you want to import.
+Please ensure that you properly replace those values in the env.sh script for the proper ones in your environment:
 
-Please ensure that you properly replace those values:
-
+* SPOKE_CLUSTER
 * DEPLOYMENT_IMAGE
 * KLUSTERLET_REG_IMAGE
 * KLUSTERLET_WORK_IMAGE
 * KUBECONFIG_HUB
-* v204_bootstrap_secret.yaml -> Replace KUBECONFIGHUB with your
-base64-encodeded kubeconfig file from the cluster that
-you want to import
 
-In order to clean the import of a cluster, please execute:
-https://github.com/ch-stark/acminstall/blob/master/scripts/crc-cleanendpoint
+Then run the following resources:
+
+```sh
+$ source ./env.sh
+$ envsubst < v210_endpoint-crd.yaml | oc apply -f -
+$ envsubst < v212_klusterlet_config.yaml | oc apply -f -
+$ envsubst < v214_bootstrap_secret.yaml | oc apply -f -
+```
+
+NOTE: These resources are based on ACM v2.1. In order to clean the import of a cluster, please execute: https://github.com/ch-stark/acminstall/blob/master/scripts/crc-cleanendpoint
