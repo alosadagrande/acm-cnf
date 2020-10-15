@@ -2,11 +2,11 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: stage-clusters 
-  namespace: openshift-ptp
+  namespace: openshift-sriov-network-operator
 spec:
   clusterConditions:
   - type: ManagedClusterConditionAvailable
     status: "True"
   clusterSelector:
     matchLabels:
-      env: "stage"
+      environment: "stage"
