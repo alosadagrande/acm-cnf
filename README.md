@@ -61,6 +61,8 @@ Before digging into how to install and configure each of the CNF operators we ne
 
 ## CNF operators
 
+Here are the different CNF components that are installed, configured and managed by ACM. Click on the one you are interested on to see the detailed configuration process:
+
 * [Performance Addon Operator](https://github.com/alosadagrande/acm-cnf/tree/master/acm-manifests/performance-operator)
 * [PTP Operator](https://github.com/alosadagrande/acm-cnf/tree/master/acm-manifests/ptp)
 * [SRIOV Network Operator](https://github.com/alosadagrande/acm-cnf/tree/master/acm-manifests/sriov-operator)
