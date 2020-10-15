@@ -11,5 +11,11 @@ Finally, you should see your cluster imported by running from the hub cluster:
 
 ```sh
 $ oc get managedclusters
+
+NAME            HUB ACCEPTED   MANAGED CLUSTER URLS   JOINED   AVAILABLE   AGE
+cnf10           true                                  True     True        8d
+cnf21           true                                  True     True        6h17m
+local-cluster   true                                  True     True        27h
+
 ```
 
