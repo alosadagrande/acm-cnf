@@ -88,5 +88,96 @@ machineconfigpool.machineconfiguration.openshift.io/worker-cnf   rendered-worker
 
 ## Configuration
 
-Configuration of the PAO is done using RHACM gitOps approach. The performance profile is located in a Git repository and RHACM applies it on a regular basis. Therefore, in order to change the performance profile it must be done through a Git workflow.
+Configuration of the Performance Addon Operator (PAO) is done using ACM GitOps approach. Actually, when we talk about PAO configuration we are referring to create or modify the `PerformanceProfile` CRD. This profile is used by PAO to apply CNF specific configuration like real-time kernel installation, hugepages configuration or cpu isolation among others.
 
+The performance profile is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the performance profile of a particular environment or group of clusters, it must be done through a Git workflow.
+
+Let's get into it. 
+
+First, we need to create the proper ACM manifests to tell ACM where this performance profile (configuration) is located, when it must be applied and who are the target clusters. 
+
+> :exclamation: These files are placed in the master branch since they are ACM specific. 
+
+In order to do that we need to create a `channel` resource that specifies the Git repository where the configuration can be found. The specific Git branch is specified in the `subscription` resource. Then, apply this configuration to target clusters labelled with staging environment using a `placementrule`.
+
+
+```sh
+$ git checkout master
+$ cd acm-manifests/performance-operator/stage
+```
+Connect to the hub cluster:
+
+```sh
+$ oc project openshift-performance-addon
+$ oc apply -f channel-pao.yaml
+$ oc apply -f app-subs-stage.yaml
+$ oc apply -f placement-stage-clusters.yaml
+```
+> :exclamation: Notice that you must have an imported cluster labelled as environment=stage to let ACM which is/are the clusters where the performance profile (configuration) must be applied.
+
+Verify in your hub cluster that those resources are correctly created and propagated:
+
+```sh
+$ oc get channel,application,placementrule  -n openshift-performance-addon
+NAME                                                         TYPE   PATHNAME                                       AGE
+channel.apps.open-cluster-management.io/pao-channel-github   Git    https://github.com/alosadagrande/acm-cnf.git   8d
+
+NAME                                   TYPE   VERSION   OWNER   READY   AGE
+application.app.k8s.io/pao-app-stage                                    8d
+
+NAME                                                                 AGE   REPLICAS
+placementrule.apps.open-cluster-management.io/placement-policy-pao   8d    
+placementrule.apps.open-cluster-management.io/stage-clusters         8d    
+```
+> :exclamation: Notice that there are two placementrules. The one required to install PAO, whose target clusters are labelled as pao=true and the new one, which is required to apply the stage configuration to stage clusters: environment=stage
+
+Lastly we can verify that the `PerformanceProfile` manifest has been propagated correctly as well from the Git branch repository to the target clusters.
+
+```sh
+$ oc get deployables
+NAME                                                                         TEMPLATE-KIND        TEMPLATE-APIVERSION                  AGE   STATUS
+pao-subscription-stage-deployable                                            Subscription         apps.open-cluster-management.io/v1   8d    Propagated
+pao-subscription-stage-operator-performance-performance-performanceprofile   PerformanceProfile   performance.openshift.io/v1alpha1    8d    
+```
+
+Next, move to your **spoke** clusters where PAO configuration is targeted and notice that a new `performanceprofile` manifest is created with the same exact values as the one it is stored in the Git repository. 
+
+```sh
+$ oc get performanceprofile
+NAME          AGE
+performance   7d7h
+```
+
+At this point everything is setup. However, you may notice that no changes are being made to worker nodes with role worker-cnf... there are no reboots... nothing is going on. That's because the `machineconfigpool` for worker-cnf is paused. We need to unpaused to let the Machine Config Operator to start applying the configuration to worker-cnf nodes.
+
+Remember that the worker-cnf `machineconfigpool` is controlled by the we applied in the installation section. So, we should not change it from the spoke cluster. Actually, the policy must be edited from the hub cluster and paused must be set to false:
+
+```yaml
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            metadata:
+              labels:
+                machineconfiguration.openshift.io/role: worker-cnf
+              name: worker-cnf
+            spec:
+              machineConfigSelector:
+                matchExpressions:
+                - key: machineconfiguration.openshift.io/role
+                  operator: In
+                  values:
+                  - worker
+                  - worker-cnf
+              nodeSelector:
+                matchLabels:
+                  node-role.kubernetes.io/worker-cnf: ""
+              paused: false
+        remediationAction: enforce
+        severity: low
+  remediationAction: enforce
+```
+
+At this point your worker-cnf nodes will start rebooting and configuring towards the desired state. 
+
+> :warning: If you need to modify the performance profile remember that it must be modified in the proper Git branch and not in the imported or spoke clusters. From now on you must follow a Git workflow.
