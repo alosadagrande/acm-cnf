@@ -37,7 +37,7 @@ cnf10-master-2.cnf10.kni.lab.eng.bos.redhat.com   Ready    master,virtual      9
 cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   6d17h   v1.19.0+db1fc96
 cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   9d      v1.19.0+db1fc96
 ```
-:warning: The imported cluster must have worker nodes SR-IOV and PTP capables otherwise the operators deployed won't actually configure the hardware appropiately. If they are not, you still can install the different operators but you won't be able to configure them.
+> :warning: The imported cluster must have worker nodes SR-IOV and PTP capables otherwise the operators deployed won't actually configure the hardware appropiately. If they are not, you still can install the different operators but you won't be able to configure them.
 
 
 ## Performance addon operator
