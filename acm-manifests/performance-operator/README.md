@@ -7,8 +7,9 @@ Performance Addon Operator installation is done using ACM policies which ensures
 * A namespace (openshift-performance-addon) where the operator will be executed 
 * Operator installation by creating the  `operatorgroup` and `subscription` objects
 * A specific `machineconfigpool` for CNF capable workers. This pool will match workers with role cnf-worker but can be whatever suits you best.
+* Proper CNF capable nodes labelled as role worker-cnf.
 
-In order to apply the policy a ` PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be install or said differently, the ones that requires the Performance Addon operator installed. In our case we will target clusters that contain the label **pao=true** added.
+In order to apply the policy named policy-pao-operator a `PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be install or said differently, the ones that requires the Performance Addon operator installed. In our case we will target clusters that contain the label **pao=true** added.
 
 First thing, in our hub cluster create the openshift-performance-addon namespace:
 
@@ -94,7 +95,14 @@ The performance profile is stored in a Git branch in this repository. ACM is in 
 
 Let's get into it. 
 
-First, we need to create the proper ACM manifests to tell ACM where this performance profile (configuration) is located, when it must be applied and who are the target clusters. 
+First thing that must be done is label the CNF capable worker nodes as role worker-cnf since the `machineconfigpool` we created during the PAO installation target them to apply the performance profile. This can be done manually or using a policy targetting one cluster at a time:
+
+```sh
+$ oc create -f policy-label-cnf10-worker-nodes.yaml
+```
+> :warning: This a very specific policy since we need to know the name of nodes in advance or get that information from ACM. Basically, applies the mentioned label to the nodes explicitly included in the policy. Also specifically targets one cluster, since usually the name of the nodes are different among clusters. 
+
+Next, we need to create the proper ACM manifests to tell ACM where this performance profile (configuration) is located, when it must be applied and who are the target clusters. 
 
 > :exclamation: These files are placed in the master branch since they are ACM specific. 
 
