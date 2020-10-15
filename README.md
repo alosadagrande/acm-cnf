@@ -2,7 +2,43 @@
 
 The idea is to use **Advanced Cluster Management for Kubernetes** (ACM) to automate the installation of the CNF operators and their specific configuration in the target clusters.
 
-Installation of CNF operators are done using ACM policies. Configuration of CNF operators are done using RHACM gitOps approach where the configuration is applied from a Git repository.
+Basically:
+
+* The **installation** of CNF operators is done using ACM policies. 
+* The **configuration** of CNF operators is done using RHACM GitOps approach where the configuration is applied from a Git repository. Therefore, we will make use of Channels, Subscriptions, Applications and PlacementRules objects to tell ACM to configure our CNF components.
+
+## Prerequisities
+
+* ACM installed in a OpenShift cluster. In my tests we run the following versions:
+
+| Component | Version |
+| --------- | ------- |
+| OpenShift | 4.6.0-0.nightly-2020-10-03-051134 (nightly build) |
+| ACM | 2.1.0 (no GA) |
+
+```sh
+$ oc get nodes -o wide
+NAME       STATUS   ROLES            AGE   VERSION           INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                                                       KERNEL-VERSION                     CONTAINER-RUNTIME
+eko6       Ready    worker           8d    v1.19.0+db1fc96   10.19.139.35   <none>        Red Hat Enterprise Linux CoreOS 46.82.202010022240-0 (Ootpa)   4.18.0-193.24.1.el8_2.dt1.x86_64   cri-o://1.19.0-20.rhaos4.6.git97d715e.el8
+eko7       Ready    worker           9d    v1.19.0+db1fc96   10.19.139.36   <none>        Red Hat Enterprise Linux CoreOS 46.82.202010022240-0 (Ootpa)   4.18.0-193.24.1.el8_2.dt1.x86_64   cri-o://1.19.0-20.rhaos4.6.git97d715e.el8
+master-0   Ready    master,virtual   9d    v1.19.0+db1fc96   10.19.140.20   <none>        Red Hat Enterprise Linux CoreOS 46.82.202010022240-0 (Ootpa)   4.18.0-193.24.1.el8_2.dt1.x86_64   cri-o://1.19.0-20.rhaos4.6.git97d715e.el8
+master-1   Ready    master,virtual   9d    v1.19.0+db1fc96   10.19.140.21   <none>        Red Hat Enterprise Linux CoreOS 46.82.202010022240-0 (Ootpa)   4.18.0-193.24.1.el8_2.dt1.x86_64   cri-o://1.19.0-20.rhaos4.6.git97d715e.el8
+master-2   Ready    master,virtual   9d    v1.19.0+db1fc96   10.19.140.22   <none>        Red Hat Enterprise Linux CoreOS 46.82.202010022240-0 (Ootpa)   4.18.0-193.24.1.el8_2.dt1.x86_64   cri-o://1.19.0-20.rhaos4.6.git97d715e.el8
+```
+
+* As target or remote clusters I imported an OpenShift cluster installed with the same nightly build
+
+```sh
+$ oc get nodes
+NAME                                              STATUS   ROLES               AGE     VERSION
+cnf10-master-0.cnf10.kni.lab.eng.bos.redhat.com   Ready    master,virtual      9d      v1.19.0+db1fc96
+cnf10-master-1.cnf10.kni.lab.eng.bos.redhat.com   Ready    master,virtual      9d      v1.19.0+db1fc96
+cnf10-master-2.cnf10.kni.lab.eng.bos.redhat.com   Ready    master,virtual      9d      v1.19.0+db1fc96
+cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   6d17h   v1.19.0+db1fc96
+cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   9d      v1.19.0+db1fc96
+```
+:warning: The imported cluster must have worker nodes SR-IOV and PTP capables otherwise the operators deployed won't actually configure the hardware appropiately. If they are not, you still can install the different operators but you won't be able to configure them.
+
 
 ## Performance addon operator
 
