@@ -18,6 +18,9 @@ namespace/openshift-performance-addon created
 ```
 Then, inside the openshift-performance-addon namespace, apply the policy which will create the placementrule and placementrulebinding as well.
 
+> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to policy-pao-operator.yaml which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace Subscription.spec.source to `redhat-operators` in the policy manifest.
+
+
 ```sh
 $ oc create -f policy-pao-operator-46.yaml 
 policy.policy.open-cluster-management.io/policy-pao-operator created
@@ -34,6 +37,7 @@ policy-pao-operator   7d19h
 ```
 
 > :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the placementRule label (pao=true)
+
 
 Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster or via CLI into the managedClusters object. Remember to set label as pao=true.
 
