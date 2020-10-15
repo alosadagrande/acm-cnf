@@ -1,11 +1,11 @@
 # Deploy and configure CNF operators the gitops way with ACM
 
-The idea is to use **Advanced Cluster Management for Kubernetes** (ACM) to automate the installation of the CNF operators and their specific configuration in the target clusters.
+The aim of this work is using **Advanced Cluster Management for Kubernetes** (ACM) to automate the installation of the CNF operators and their specific configuration in the target clusters.
 
-Basically:
+The process is basically summed up in:
 
 * The **installation** of CNF operators is done using ACM policies. 
-* The **configuration** of CNF operators is done using RHACM GitOps approach where the configuration is applied from a Git repository. Therefore, we will make use of Channels, Subscriptions, Applications and PlacementRules objects to tell ACM to configure our CNF components.
+* The **configuration** of CNF operators is done using ACM GitOps approach where the configuration is applied from a Git repository. Therefore, we will make use of Channels, Subscriptions, Applications and PlacementRules objects to tell ACM to configure our CNF components.
 
 ## Prerequisities
 
@@ -27,6 +27,8 @@ master-2   Ready    master,virtual   9d    v1.19.0+db1fc96   10.19.140.22   <non
 ```
 
 * As target or remote clusters I imported an OpenShift cluster installed with the same nightly build
+
+> :exclamation: Importing a cluster can be done using the ACM web user interface or using the CLI in a more scripted way. Take a look to the following [notes](https://github.com/alosadagrande/acm-cnf/tree/master/auto-import-clusters) on how to import clusters from command line.
 
 ```sh
 $ oc get nodes
