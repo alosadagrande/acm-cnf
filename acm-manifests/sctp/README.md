@@ -37,7 +37,7 @@ spec:
 
 > :exclamation: Notice that basically we are enabling the SCTP kernel module by adding sctp to the /etc/modules-load of the proper OpenShift nodes.
 
-The deployment manifest is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the configuration of a particular environment or group of clusters, it must be done through a Git workflow.
+The machineConfig manifest is stored in a Git branch (stage) in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the configuration of a particular environment or group of clusters, it must be done through a Git workflow.
 
 Let's get into it.
 
