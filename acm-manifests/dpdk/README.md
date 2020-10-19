@@ -119,8 +119,6 @@ ReplicaSet "testpmd-869bccdd77" has timed out progressing.
 
 If we add the privileged SCC to default serviceAccount or even better, if we add a new serviceAccount in charge of running DPDK with that permissions we will see the testpmd pod running:
 
-
-
 ```sh
 oc get pods -l app=testpmd
 
