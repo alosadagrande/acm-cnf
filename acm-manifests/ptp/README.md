@@ -173,7 +173,6 @@ linuxptp-daemon-2pdvf         2/2     Running   0          10d   10.19.135.105  
 linuxptp-daemon-7v6rk         2/2     Running   0          10d   10.19.135.106   cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com    <none>           <none>
 
 
-```sh
 $ oc logs linuxptp-daemon-2pdvf -c linuxptp-daemon-container | grep master
 phc2sys[719189.909]: selecting CLOCK_REALTIME as the master clock
 ptp4l[719211.167]: selected local clock 98039b.fffe.618048 as best master
@@ -184,7 +183,6 @@ ptp4l[719211.167]: assuming the grand master role
 
 
 
-Specific configuration of PTP grandmaster and slaves are done using RHACM gitOps approach. The grandmaster profile and slave profile are stored and applied from Git.
 
 
 
