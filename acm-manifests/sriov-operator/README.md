@@ -1,43 +1,44 @@
-# ACM & the PTP Operator
+# ACM & the SRIOV Network Operator
 
 ## Installation
 
-The installation of PTP operator is done using ACM policies which ensures the following objects exist in the spoke clusters:
+The installation of SRIOV Network Operator (SRIOV Operator) is done using ACM policies which ensures the following objects exist in the spoke clusters:
 
-* The namespace where the operator will be executed. Default namespace is `openshift-ptp`
+* The namespace where the operator will be executed. Default namespace is `openshift-sriov-network-operator`
 * Operator installation by creating the `operatorgroup` and `subscription` objects.
-* The `PTPOperatorConfig` is modified so PTP daemonset only targets PTP capable nodes, which in our case are the node labelled as role worker-cnf.
+* The `SriovOperatorConfig` is modified so sriov-network-config-daemon daemonset only targets SRIOV capable nodes, which in our case are the node labelled as role worker-cnf.
 * Proper CNF capable nodes labelled as role worker-cnf.
+* Cluster network object is modified to add a dummy-dhcp-network required by SRIOV Network Operator.
 
-In order to apply the policy named **policy-ptp-operator** a `PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be installed or said differently, the ones that requires the PTP operator installed. In our case we will target clusters that contain the label **ptp=true** added.
+In order to apply the policy named **policy-sriov-operator** a `PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be installed or said differently, the ones that requires the SRIOV operator installed. In our case we will target clusters that contain the label **sriov=true** added.
 
-First thing, in our hub cluster create the openshift-performance-addon namespace:
+First thing, in our hub cluster create the openshift-sriov-network-operator namespace:
 
 ```sh
-$ oc create ns openshift-ptp
-namespace/openshift-ptp created
+$ oc create ns openshift-sriov-network-operator
+namespace/openshift-sriov-network-operator created
 ```
 
-Then, inside the openshift-ptp namespace, apply the policy which will create both the `placementrule` and `placementrulebinding`.
+Then, inside the openshift-sriov-network-operator namespace, apply the policy which will also create both the `placementrule` and `placementrulebinding`.
 
-> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to `policy-ptp-operator.yaml` which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace `Subscription.spec.source` to redhat-operators in the policy manifest.
+> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to `policy-sriov-operator.yaml` which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace `Subscription.spec.source` to redhat-operators in the policy manifest.
 
 ```sh
-$ oc create -f policy-ptp-operator-46.yaml 
-policy.policy.open-cluster-management.io/policy-ptp-operator created
-placementbinding.policy.open-cluster-management.io/binding-policy-ptp created
-placementrule.apps.open-cluster-management.io/placement-policy-ptp created
+$ oc create -f policy-sriov-operator-46.yaml 
+policy.policy.open-cluster-management.io/policy-sriov-operator created
+placementbinding.policy.open-cluster-management.io/binding-policy-sriov created
+placementrule.apps.open-cluster-management.io/placement-policy-sriov created
 ```
 
 Verify the policy is created:
 
 ```sh
-$ oc get policy -n openshift-ptp
-NAME                  AGE
-policy-ptp-operator   35s
+$ oc get policy -n openshift-sriov-network-operator
+NAME                    AGE
+policy-sriov-operator   24s
 ```
 
-> :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the `placementRule` label (ptp=true)
+> :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the `placementRule` label (sriov=true)
 
 Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster. You can also use oc CLI and modify the proper `managedCluster` object. Remember to set label as ptp=true.
 
@@ -68,28 +69,38 @@ metadata:
 Once the spoke cluster is labelled the policy will have a target cluster to enforce it. Then check that the different objects were created successfully in the target cluster:
 
 ```sh
-$Th oc get pods,operatorgroup,subscription.operators.coreos.com,ptpoperatorconfig -n openshift-ptp
-NAME                              READY   STATUS    RESTARTS   AGE
-pod/linuxptp-daemon-2pdvf         2/2     Running   0          10d
-pod/linuxptp-daemon-7v6rk         2/2     Running   0          9d
-pod/ptp-operator-5f76d96f-5dhgg   1/1     Running   0          11d
+$ oc get pods,operatorgroup,subscription.operators.coreos.com,SriovOperatorConfig
+NAME                                          READY   STATUS    RESTARTS   AGE
+pod/network-resources-injector-785t5          1/1     Running   0          11d
+pod/network-resources-injector-969b6          1/1     Running   0          11d
+pod/network-resources-injector-nt8tm          1/1     Running   0          11d
+pod/operator-webhook-m4vz8                    1/1     Running   0          11d
+pod/operator-webhook-mnx6p                    1/1     Running   0          11d
+pod/operator-webhook-pdhs2                    1/1     Running   0          11d
+pod/sriov-cni-mbg2m                           2/2     Running   0          11d
+pod/sriov-cni-pqzlm                           2/2     Running   0          10d
+pod/sriov-device-plugin-5xrdw                 1/1     Running   0          2d8h
+pod/sriov-device-plugin-hbtb8                 1/1     Running   0          5h8m
+pod/sriov-network-config-daemon-4f6d9         1/1     Running   0          10d
+pod/sriov-network-config-daemon-8sbfm         1/1     Running   0          11d
+pod/sriov-network-operator-789df4b87b-fk494   1/1     Running   0          11d
 
-NAME                                               AGE
-operatorgroup.operators.coreos.com/ptp-operators   11d
+NAME                                                        AGE
+operatorgroup.operators.coreos.com/sriov-network-operator   11d
 
-NAME                                                          PACKAGE        SOURCE                       CHANNEL
-subscription.operators.coreos.com/ptp-operator-subscription   ptp-operator   performance-addon-operator   4.6
+NAME                                                                    PACKAGE                  SOURCE                       CHANNEL
+subscription.operators.coreos.com/sriov-network-operator-subscription   sriov-network-operator   performance-addon-operator   4.6
 
-NAME                                         AGE
-ptpoperatorconfig.ptp.openshift.io/default   11d
+NAME                                                    AGE
+sriovoperatorconfig.sriovnetwork.openshift.io/default   11d
 ```
-
-
 
 
 ## Configuration
 
-Configuration of the PTP Operator (PTP) is done using ACM GitOps approach. Actually, when we talk about PTP configuration we are referring to create or modify the `PTPConfig CRD` and creating two profiles: the grandmaster and the slave. Those PTP profiles are used by the linuxptp-daemon pods, which are actually deployed as a daemonSet, to set which node will perform the PTP master clock role and what nodes (slaves) are going to sync against the master clock.
+Configuration of the SRIOV Network Operator (SRIOV) is done using ACM GitOps approach. Actually, when we talk about SRIOV configuration we are referring to create or modify a couple of SRIOV related CRDs:
+
+`PTPConfig CRD` and creating two profiles: the grandmaster and the slave. Those PTP profiles are used by the linuxptp-daemon pods, which are actually deployed as a daemonSet, to set which node will perform the PTP master clock role and what nodes (slaves) are going to sync against the master clock.
 
 Both `ptpConfig` profile is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the performance profile of a particular environment or group of clusters, it must be done through a Git workflow.
 
