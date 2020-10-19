@@ -91,7 +91,7 @@ ptpoperatorconfig.ptp.openshift.io/default   11d
 
 Configuration of the PTP Operator (PTP) is done using ACM GitOps approach. Actually, when we talk about PTP configuration we are referring to create or modify the `PTPConfig CRD` and creating two profiles: the grandmaster and the slave. Those PTP profiles are used by the linuxptp-daemon pods, which are actually deployed as a daemonSet, to set which node will perform the PTP master clock role and what nodes (slaves) are going to sync against the master clock.
 
-Both `ptpConfig` profile is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the performance profile of a particular environment or group of clusters, it must be done through a Git workflow.
+Both `ptpConfig` profile is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the PTP profile of a particular environment or group of clusters, it must be done through a Git workflow.
 
 Let's get into it.
 
