@@ -100,33 +100,32 @@ sriovoperatorconfig.sriovnetwork.openshift.io/default   11d
 
 Configuration of the SRIOV Network Operator (SRIOV) is done using ACM GitOps approach. Actually, when we talk about SRIOV configuration we are referring to create or modify a couple of SRIOV related CRDs:
 
-`PTPConfig CRD` and creating two profiles: the grandmaster and the slave. Those PTP profiles are used by the linuxptp-daemon pods, which are actually deployed as a daemonSet, to set which node will perform the PTP master clock role and what nodes (slaves) are going to sync against the master clock.
+* [SRIOV Network object](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network.yaml)
+* [SRIOV Network Node Policy](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network-node-policy-netdevice.yaml)
+* Test executing a [pod](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/deployment-sriov-pod-test.yaml) requesting a VFS from a SRIOV capable node.
 
-Both `ptpConfig` profile is stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change the performance profile of a particular environment or group of clusters, it must be done through a Git workflow.
+> :warning: `SriovNetworkNodePolicy` must be adapted to your environment since depends on the NIC model and NIC interface you are planning to use.
+
+`SriovNetworkNodePolicy` and `SriovNetwork` are create in the hub `openshift-sriov-network-operator` namespace. They are needed to expose the SRIOV Virtual Functions (VFs) to a pod that requires SRIOV features. In our case, we are planning to deploy a test pod that will make use of the SRIOV Network defined. Basically, it is created with two interfaces leveraging Multus integration: one is connected to the OpenShift network and the other will be directly connected to a SRIOV Virtual Function (VFs) of the physical server where the pod is running.
+
+All configuration files: `SriovNetworkNodePolicy`, `SriovNetwork` and test-pod `Deployment` are stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change any of these files on a particular environment or group of clusters, it must be done through a Git workflow.
 
 Let's get into it.
 
-> :warning: If you already installed the Performance Addon Operator then you already have the worker-cnf machineconfigpool in place.
+> :warning: If you already installed the Performance Addon Operator then you already have the worker-cnf machineConfigPool in place. Otherwise take a look to Performance Addon Operator policy where it the worker-cnf machineConfigPool is created
 
-First thing that must be done is label the PTP capable worker nodes as ptp/grandmaster and ptp/slaves. This can be done manually or using a policy targetting one cluster at a time:
-
-```sh
-$ oc create -f policy-label-cnf10-worker-nodes.yaml
-```
-> :exclamation: Note that the name of the nodes labelled in the policy will probably differ from yours. Note that this is a very specific policy since we need to know the name of nodes in advance or get that information from ACM. 
-
-Next, we need to create the proper ACM manifests to tell ACM where the `ptpConfig` files are locate and which cluster will be targetted. Note that these files are placed in the master branch since they are ACM specific.
+We need to create the proper ACM manifests to tell ACM where the `ptpConfig` files are locate and which cluster will be targetted. Note that these files are placed in the master branch since they are ACM specific.
 
 ```sh
 $ git checkout master
-$ cd acm-manifests/ptp/stage
+$ cd acm-manifests/sriov-operator/stage
 ```
 Connect to the hub cluster:
 
 ```sh
-$ oc project openshift-ptp
-$ oc apply -f channel-ptp.yaml
-$ oc apply -f app-subs-ptp.yaml
+$ oc project openshift-sriov-network-operator
+$ oc apply -f channel-sriov.yaml
+$ oc apply -f app-subs-sriov.yaml
 $ oc apply -f placement-stage-clusters.yaml
 ```
 > :exclamation: Notice that you must have an imported cluster labelled as environment=stage to let ACM which is/are the clusters where the PTP configuration files must be applied.
@@ -134,63 +133,74 @@ $ oc apply -f placement-stage-clusters.yaml
 Verify in your hub cluster that those resources are correctly created and propagated:
 
 ```sh
-$ oc get channel,application,placementrule  -n openshift-ptp
+$ oc get channel,application,placementrule
 
-NAME                                                         TYPE   PATHNAME                                       AGE
-channel.apps.open-cluster-management.io/ptp-channel-github   Git    https://github.com/alosadagrande/acm-cnf.git   11d
+NAME                                                           TYPE   PATHNAME                                       AGE
+channel.apps.open-cluster-management.io/sriov-channel-github   Git    https://github.com/alosadagrande/acm-cnf.git   11d
 
-NAME                                   TYPE   VERSION   OWNER   READY   AGE
-application.app.k8s.io/ptp-app-stage                                    11d
+NAME                                     TYPE   VERSION   OWNER   READY   AGE
+application.app.k8s.io/sriov-app-stage                                    11d
 
-NAME                                                                 AGE    REPLICAS
-placementrule.apps.open-cluster-management.io/placement-policy-ptp   119m   
-placementrule.apps.open-cluster-management.io/stage-clusters         11d    
+NAME                                                                   AGE   REPLICAS
+placementrule.apps.open-cluster-management.io/placement-policy-sriov   32m   
+placementrule.apps.open-cluster-management.io/stage-clusters           11d   
 ```
-Notice that there are two placementrules. The one required to install PTP whose target clusters are labelled as pao=true and the new one which is required to apply the stage configuration to stage clusters actually labelled as environment=stage.
+
+Notice that there are two placementrules. The one required to install SRIOV Network Operator whose target clusters are labelled as sriov=true and the new one which is required to apply the stage configuration to stage clusters actually labelled as environment=stage.
 
 Lastly we can verify that the `ptpConfig` manifest has been propagated correctly as well from the Git branch repository to the target clusters.
 
 ```sh
-$ oc get deployables
-NAME                                                        TEMPLATE-KIND   TEMPLATE-APIVERSION                  AGE   STATUS
-ptp-subscription-stage-deployable                           Subscription    apps.open-cluster-management.io/v1   11d   Propagated
-ptp-subscription-stage-operator-ptp-grandmaster-ptpconfig   PtpConfig       ptp.openshift.io/v1                  11d   
-ptp-subscription-stage-operator-ptp-slave-ptpconfig         PtpConfig       ptp.openshift.io/v1                  11d   
+$ oc get deployables 
+NAME                                                                                          TEMPLATE-KIND            TEMPLATE-APIVERSION                  AGE   STATUS
+sriov-subscription-operator-deployable                                                        Subscription             apps.open-cluster-management.io/v1   11d   Propagated
+sriov-subscription-operator-operator-sriov-sriov-network-node-policy-sriovnetworknodepolicy   SriovNetworkNodePolicy   sriovnetwork.openshift.io/v1         11d   
+sriov-subscription-operator-operator-sriov-sriov-network-sriovnetwork                         SriovNetwork             sriovnetwork.openshift.io/v1         11d   
+sriov-subscription-operator-operator-sriov-sriov-pod-test-deployment                          Deployment               apps/v1                              11d   
 ```
 
-Next, move to your **spoke** cluster where PTP configuration is targeted and notice that a two PTP configuration profiles are created with the same exact values as the one it is stored in the Git repository.
+Next, move to your **spoke** cluster where SRIOV configuration is targeted and notice that a two SRIOV Network Policies are shown. The one called sriov-network-node-policy is the applied. See that a SRIOV Network is created along with a test pod which is in Running state. 
+
+> :exclamation: The sriov-pod-test in Running state allows us to verify quickly that the SRIOV configuration is set up correctly.
 
 ```sh 
-$ oc get ptpconfig -n openshift-ptp
-NAME          AGE
-grandmaster   10d
-slave         10d
+$ oc get sriovnetworknodepolicy,sriovnetwork,deployment -n openshift-sriov-network-operator
+
+NAME                                                                         AGE
+sriovnetworknodepolicy.sriovnetwork.openshift.io/default                     11d
+sriovnetworknodepolicy.sriovnetwork.openshift.io/sriov-network-node-policy   11d
+
+NAME                                                   AGE
+sriovnetwork.sriovnetwork.openshift.io/sriov-network   11d
+
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/sriov-network-operator   1/1     1            1           11d
+deployment.apps/sriov-pod-test           1/1     1            1           11d
 ```
 
-Finally you can verify that the slave profile is run by worker-cnf nodes labelled as ptp/slave (cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com), while the grandmaster ptp profile is run by the unique node labelled as ptp/grandmaster (cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com).
+Finally you can verify that the test pod is connected to the host network using the SRIOV Network Virtual Function. Notice that the physical network address available is 172.22.0.0/24. See there are three interfaces: local, OpenShift network and the physical one exposed as a SRIOV VF.
 
 ```sh
-$ oc get nodes --show-labels | grep ptp
-cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   10d   v1.19.0+db1fc96   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com,kubernetes.io/os=linux,node-role.kubernetes.io/worker-cnf=,node-role.kubernetes.io/worker=,node.openshift.io/os_id=rhcos,ptp/grandmaster=
-
-cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com    Ready    worker,worker-cnf   13d   v1.19.0+db1fc96   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com,kubernetes.io/os=linux,node-role.kubernetes.io/worker-cnf=,node-role.kubernetes.io/worker=,node.openshift.io/os_id=rhcos,ptp/slave=
+oc rsh sriov-pod-test-59cf8bdf74-927zt ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+3: eth0@if69: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default 
+    link/ether 0a:58:0a:87:01:42 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.135.1.66/23 brd 10.135.1.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::858:aff:fe87:142/64 scope link 
+       valid_lft forever preferred_lft forever
+25: net1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether f6:fa:a1:bd:70:60 brd ff:ff:ff:ff:ff:ff
+    inet 172.22.0.208/24 brd 172.22.0.255 scope global net1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::f4fa:a1ff:febd:7060/64 scope link 
+       valid_lft forever preferred_lft forever
 ```
-Here you can see the linuxptp pod names running on each node. So the `linuxptp-daemon-2pdvf` pod must run as the PTP grandmaster while `linuxptp-daemon-7v6rk` run as a PTP slave:
-
-```sh
- oc get pods -o wide -n openshift-ptp
-NAME                          READY   STATUS    RESTARTS   AGE   IP              NODE                                              NOMINATED NODE   READINESS GATES
-linuxptp-daemon-2pdvf         2/2     Running   0          10d   10.19.135.105   cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com    <none>           <none>
-linuxptp-daemon-7v6rk         2/2     Running   0          10d   10.19.135.106   cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com    <none>           <none>
-
-
-$ oc logs linuxptp-daemon-2pdvf -c linuxptp-daemon-container | grep master
-phc2sys[719189.909]: selecting CLOCK_REALTIME as the master clock
-ptp4l[719211.167]: selected local clock 98039b.fffe.618048 as best master
-ptp4l[719211.167]: assuming the grand master role
-```
-
-
 
 
 
