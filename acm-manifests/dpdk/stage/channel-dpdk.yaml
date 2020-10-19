@@ -2,7 +2,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
   name: dpdk-channel-github
-  namespace: cnf-gitops
+  namespace: openshift-sriov-network-operator 
 spec:
   type: Git
   pathname: https://github.com/alosadagrande/acm-cnf.git
