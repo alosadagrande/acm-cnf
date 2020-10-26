@@ -2,14 +2,14 @@
 
 ## Installation
 
-There is actually installation of DPDK because it is not an operator. However, it requires SRIOV and Hugepages to be properly configured. SRIOV Network is handled by the SRIOV Network Operator while Hugepages can be easily managed by the Performance Addon Operator. Then, as a prequisite install PAO and SRIOV Operator first.
+There is actually no installation of DPDK because it is not an operator. However, it requires SRIOV and Hugepages to be properly configured. SRIOV Network is handled by the SRIOV Network Operator while Hugepages can be easily managed by the Performance Addon Operator. Then, as a prequisite install PAO and SRIOV Operator first.
 
 Once the operators are running and the requirements detailed previously in place it is time to run the pod that contains `testpmd` application which leverages DPDK libraries included in the container image. The container image quay.io/alosadag/testpmd:tekton was already built with testpmd and DPDK libraries, so it is ready just to be executed. Further information on how to build DPDK images can be found in this article: [Building CNF applications with OpenShift Pipelines
 ](https://www.openshift.com/blog/building-cnf-applications-with-openshift-pipelines)
 
 ## Configuration
 
-Configuration or best said running a DPDK application is done using ACM GitOps approach. Actually, when we talk about DPDK configuration we are referring to create or modify the testpmd `deployment` manifest.
+Configuration or better said running a DPDK application is done using ACM GitOps approach. Actually, when we talk about DPDK configuration we are referring to create or modify the testpmd `deployment` manifest.
 
 ```yaml
       containers:
