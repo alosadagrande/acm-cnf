@@ -16,6 +16,6 @@ oc get secret $SPOKE_CLUSTER-import -o "jsonpath={.data['crds\.yaml']}" -n $SPOK
 oc get secret $SPOKE_CLUSTER-import -o "jsonpath={.data['import\.yaml']}" -n $SPOKE_CLUSTER | base64 -d > ./spoke/import-${SPOKE_CLUSTER}.yaml
 
 # SPOKE CLUSTER
-export KUBECONFIG=/home/alosadag/SYSENG/CNF/cnf21-ocp/auth/kubeconfig
+export KUBECONFIG=/home/alosadag/SYSENG/CNF/${SPOKE_CLUSTER}-ocp/auth/kubeconfig
 oc apply -f ./spoke/crds-${SPOKE_CLUSTER}.yaml 
 oc apply -f ./spoke/import-${SPOKE_CLUSTER}.yaml
