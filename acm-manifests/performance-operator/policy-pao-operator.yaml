@@ -27,7 +27,9 @@ spec:
                 apiVersion: v1
                 kind: Namespace # must have openshift-pao
                 metadata:
-                  name: openshift-performance-addon
+                  name: openshift-performance-addon-operator
+                  labels: 
+                    openshift.io/run-level: "1"
                 spec: {}
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
@@ -46,11 +48,11 @@ spec:
                 apiVersion: operators.coreos.com/v1
                 kind: OperatorGroup
                 metadata:
-                  name: performance-addon-operator
-                  namespace: openshift-performance-addon
+                  name: openshift-performance-addon-operator
+                  namespace: openshift-performance-addon-operator
                 spec:
                   targetNamespaces:
-                    - openshift-performance-addon
+                    - openshift-performance-addon-operator
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
@@ -68,10 +70,10 @@ spec:
                 apiVersion: operators.coreos.com/v1alpha1
                 kind: Subscription
                 metadata:
-                  name: performance-addon-operator
-                  namespace: openshift-performance-addon
+                  name: openshift-performance-addon-operator-subscription
+                  namespace: openshift-performance-addon-operator
                 spec:
-                  channel: "4.5"
+                  channel: "4.6"
                   name: performance-addon-operator
                   source: redhat-operators
                   sourceNamespace: openshift-marketplace
