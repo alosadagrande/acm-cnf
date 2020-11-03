@@ -18,7 +18,7 @@ spec:
       labels:
         app: sriov-pod-test
       annotations:
-        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/sriov-network
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/sriov-network-mh
     spec:
       containers:
         - image: quay.io/schseba/utility-container:latest
