@@ -183,7 +183,7 @@ performance   86s
 
 At this point everything is setup. However, you may notice that no changes are being made to worker nodes with role worker-cnf... there are no reboots... nothing is going on. That's because the `machineconfigpool` for worker-cnf is paused. We need to unpaused to let the Machine Config Operator start applying the configuration to worker-cnf nodes.
 
-Remember that the worker-cnf `machineconfigpool` is the one we applied in the installation section. So, we should not change it from the spoke cluster. Actually, the policy must be edited from the hub cluster and paused must be set to false:
+Remember that the worker-cnf `machineconfigpool` is controlled by the [policy](./policy-pao-operator.yaml) we applied in the installation section. So, we should not change it from the spoke cluster but editing the policy from the hub cluster setting the field paused to false (unpause):
 
 ```yaml
         - complianceType: musthave
