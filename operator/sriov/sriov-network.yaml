@@ -7,6 +7,6 @@ spec:
   ipam: |-
     {}
   networkNamespace: openshift-sriov-network-operator
-  resourceName: sriovnic-0
+  resourceName: sriovnic0
   vlan: 101
   capabilities: '{ "mac": true, "ips": false }'
