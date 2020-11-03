@@ -74,8 +74,7 @@ spec:
                   name: ptp-operator-subscription
                   namespace: openshift-ptp
                 spec:
-                  channel: "4.5"
-                  installPlanApproval: Automatic
+                  channel: "4.6"
                   name: ptp-operator
                   source: "redhat-operators"
                   sourceNamespace: openshift-marketplace
@@ -100,7 +99,37 @@ spec:
                   namespace: openshift-ptp
                 spec:
                   daemonNodeSelector:
-                    node-role.kubernetes.io/worker-cnf: ""             
+                    node-role.kubernetes.io/worker-cnf: ""
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-pao-perfprofile
+        spec:
+          remediationAction: enforce # the policy-template spec.remediationAction is overridden by the preceding parameter value for spec.remediationAction.
+          severity: low
+          namespaceSelector:
+            exclude: ["kube-*"]
+            include: ["*"]
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: machineconfiguration.openshift.io/v1
+                kind: MachineConfigPool
+                metadata:
+                  name: worker-cnf
+                  labels:
+                    machineconfiguration.openshift.io/role: worker-cnf
+                spec:
+                  paused: true
+                  machineConfigSelector:
+                    matchExpressions:
+                      - key: machineconfiguration.openshift.io/role
+                        operator: In
+                        values: [worker,worker-cnf]
+                  nodeSelector:
+                    matchLabels:
+                      node-role.kubernetes.io/worker-cnf: ""
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
