@@ -18,8 +18,7 @@ First thing, in our hub cluster create the openshift-sriov-network-operator name
 $ oc create ns openshift-sriov-network-operator
 namespace/openshift-sriov-network-operator created
 ```
-
-Then, inside the openshift-sriov-network-operator namespace, apply the policy which will also create both the `placementrule` and `placementrulebinding`.
+Then, inside the openshift-sriov-network-operator namespace, apply the policy which will install the operator and also create both the `placementrule` and `placementrulebinding`.
 
 > :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to `policy-sriov-operator.yaml` which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace `Subscription.spec.source` to redhat-operators in the policy manifest.
 
@@ -40,7 +39,12 @@ policy-sriov-operator   24s
 
 > :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the `placementRule` label (sriov=true)
 
-Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster. You can also use oc CLI and modify the proper `managedCluster` object. Remember to set label as ptp=true.
+Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster. You can also use oc CLI and modify the proper `managedCluster` object. Remember to set label as sriov=true.
+
+```sh
+$ oc patch managedClusters cnf10 --type=merge -p '{"metadata":{"labels":{"sriov":"true"}}}'
+managedcluster.cluster.open-cluster-management.io/cnf10 patched
+```
 
 ```sh
 $ oc get managedClusters -o yaml cnf10
@@ -70,31 +74,27 @@ Once the spoke cluster is labelled the policy will have a target cluster to enfo
 
 ```sh
 $ oc get pods,operatorgroup,subscription.operators.coreos.com,SriovOperatorConfig
+
 NAME                                          READY   STATUS    RESTARTS   AGE
-pod/network-resources-injector-785t5          1/1     Running   0          11d
-pod/network-resources-injector-969b6          1/1     Running   0          11d
-pod/network-resources-injector-nt8tm          1/1     Running   0          11d
-pod/operator-webhook-m4vz8                    1/1     Running   0          11d
-pod/operator-webhook-mnx6p                    1/1     Running   0          11d
-pod/operator-webhook-pdhs2                    1/1     Running   0          11d
-pod/sriov-cni-mbg2m                           2/2     Running   0          11d
-pod/sriov-cni-pqzlm                           2/2     Running   0          10d
-pod/sriov-device-plugin-5xrdw                 1/1     Running   0          2d8h
-pod/sriov-device-plugin-hbtb8                 1/1     Running   0          5h8m
-pod/sriov-network-config-daemon-4f6d9         1/1     Running   0          10d
-pod/sriov-network-config-daemon-8sbfm         1/1     Running   0          11d
-pod/sriov-network-operator-789df4b87b-fk494   1/1     Running   0          11d
+pod/network-resources-injector-54jxn          1/1     Running   0          7m26s
+pod/network-resources-injector-5ckgr          1/1     Running   0          7m26s
+pod/network-resources-injector-8rhlf          1/1     Running   0          7m26s
+pod/operator-webhook-csfcw                    1/1     Running   0          7m26s
+pod/operator-webhook-k22s4                    1/1     Running   0          7m26s
+pod/operator-webhook-zkgpk                    1/1     Running   0          7m26s
+pod/sriov-network-config-daemon-rq76v         1/1     Running   0          3m28s
+pod/sriov-network-config-daemon-twpq7         1/1     Running   0          2m53s
+pod/sriov-network-operator-5f9bc55cf6-dw7l6   1/1     Running   0          7m55s
 
-NAME                                                        AGE
-operatorgroup.operators.coreos.com/sriov-network-operator   11d
+NAME                                                         AGE
+operatorgroup.operators.coreos.com/sriov-network-operators   8m36s
 
-NAME                                                                    PACKAGE                  SOURCE                       CHANNEL
-subscription.operators.coreos.com/sriov-network-operator-subscription   sriov-network-operator   performance-addon-operator   4.6
+NAME                                                                    PACKAGE                  SOURCE             CHANNEL
+subscription.operators.coreos.com/sriov-network-operator-subscription   sriov-network-operator   redhat-operators   4.6
 
 NAME                                                    AGE
-sriovoperatorconfig.sriovnetwork.openshift.io/default   11d
+sriovoperatorconfig.sriovnetwork.openshift.io/default   7m29s
 ```
-
 
 ## Configuration
 
@@ -146,9 +146,9 @@ placementrule.apps.open-cluster-management.io/placement-policy-sriov   32m
 placementrule.apps.open-cluster-management.io/stage-clusters           11d   
 ```
 
-Notice that there are two placementrules. The one required to install SRIOV Network Operator whose target clusters are labelled as sriov=true and the new one which is required to apply the stage configuration to stage clusters actually labelled as environment=stage.
+Notice that there are two placementrules. The one required to install SR-IOV Network Operator whose target clusters are labelled as sriov=true and the new one which is required to apply the stage configuration to stage clusters actually labelled as environment=stage.
 
-Lastly we can verify that the `ptpConfig` manifest has been propagated correctly as well from the Git branch repository to the target clusters.
+Lastly, we can verify that the SR-IOV Network and SR-IOV Network Node Policy manifests have been propagated correctly as well from the Git branch repository to the target clusters. Also, a test application is deployed to verify that SR-IOV is correctly configured.
 
 ```sh
 $ oc get deployables 
@@ -161,7 +161,9 @@ sriov-subscription-operator-operator-sriov-sriov-pod-test-deployment            
 
 Next, move to your **spoke** cluster where SRIOV configuration is targeted and notice that a two SRIOV Network Policies are shown. The one called sriov-network-node-policy is the applied. See that a SRIOV Network is created along with a test pod which is in Running state. 
 
-> :exclamation: The sriov-pod-test in Running state allows us to verify quickly that the SRIOV configuration is set up correctly.
+> :exclamation: The sriov-pod-test in Running state allows us to verify quickly that the SR-IOV configuration is set up correctly.
+
+> :warning: In order to run test SR-IOV application we need to add the privileged SCC to default serviceAccount or even better, we can create a new serviceAccount in charge of running test application with privileged permissions
 
 ```sh 
 $ oc get sriovnetworknodepolicy,sriovnetwork,deployment -n openshift-sriov-network-operator
