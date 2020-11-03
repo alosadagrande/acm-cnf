@@ -11,19 +11,18 @@ Performance Addon Operator installation is done using ACM policies which ensures
 
 In order to apply the policy named policy-pao-operator a `PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be install or said differently, the ones that requires the Performance Addon operator installed. In our case we will target clusters that contain the label **pao=true** added.
 
-First thing, in our hub cluster create the openshift-performance-addon namespace:
+First thing, in our hub cluster create the openshift-performance-addon-operator namespace:
 
 ```sh
-$ oc create ns openshift-performance-addon
-namespace/openshift-performance-addon created
+$ oc create ns openshift-performance-addon-operator
+namespace/openshift-performance-addon-operator created
 ```
 Then, inside the openshift-performance-addon namespace, apply the policy which will create the placementrule and placementrulebinding as well.
 
-> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to policy-pao-operator.yaml which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace Subscription.spec.source to `redhat-operators` in the policy manifest.
-
+> :exclamation: Here we are using the operator for OpenShift 4.6 which is the General Available (GA) version at the moment of writing. This should be adapted once OpenShift 4.7 is released.
 
 ```sh
-$ oc create -f policy-pao-operator-46.yaml 
+$ oc create -f policy-pao-operator.yaml 
 policy.policy.open-cluster-management.io/policy-pao-operator created
 placementbinding.policy.open-cluster-management.io/binding-policy-pao created
 placementrule.apps.open-cluster-management.io/placement-policy-pao created
@@ -32,15 +31,19 @@ placementrule.apps.open-cluster-management.io/placement-policy-pao created
 Verify the policy is created:
 
 ```sh
-$ oc get policy -n openshift-performance-addon
+$ oc get policy -n openshift-performance-addon-operator
 NAME                  AGE
-policy-pao-operator   7d19h
+policy-pao-operator   28s
 ```
 
 > :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the placementRule label (pao=true)
 
+Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster or via CLI into the managedClusters object. Remember to set label as pao=true. This step can be executed from the UI or editing the proper cluster managedCluster object.
 
-Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster or via CLI into the managedClusters object. Remember to set label as pao=true.
+```sh
+$ oc patch managedClusters cnf10 --type=merge -p '{"metadata":{"labels":{"pao":"true"}}}'
+managedcluster.cluster.open-cluster-management.io/cnf10 patched
+```
 
 ```sh
 $ oc get managedClusters -o yaml cnf10
@@ -69,20 +72,21 @@ metadata:
 Once the spoke cluster is labelled the policy will have a target cluster to enforce it. Then check that the different objects were created successfully in the target cluster:
 
 ```sh
-$ oc get pods,operatorgroup,subscription.operators.coreos.com,mcp -n openshift-performance-addon
+$ oc get pods,operatorgroup,subscription.operators.coreos.com,mcp -n openshift-performance-addon-operator
+
 NAME                                        READY   STATUS    RESTARTS   AGE
-pod/performance-operator-5668d87d74-9jkd2   1/1     Running   0          7d
+pod/performance-operator-697445d55b-4djrd   1/1     Running   0          59s
 
-NAME                                                            AGE
-operatorgroup.operators.coreos.com/performance-addon-operator   7d19h
+NAME                                                                      AGE
+operatorgroup.operators.coreos.com/openshift-performance-addon-operator   107s
 
-NAME                                                           PACKAGE                      SOURCE                       CHANNEL
-subscription.operators.coreos.com/performance-addon-operator   performance-addon-operator   performance-addon-operator   4.6
+NAME                                                                                  PACKAGE                      SOURCE             CHANNEL
+subscription.operators.coreos.com/openshift-performance-addon-operator-subscription   performance-addon-operator   redhat-operators   4.6
 
-NAME                                                             CONFIG                                                 UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT   UPDATEDMACHINECOUNT   DEGRADEDMACHINECOUNT   AGE
-machineconfigpool.machineconfiguration.openshift.io/master       rendered-master-8c55ecb54824e28391c5c144b3fc9244       True      False      False      3              3                   3                     0                      9d
-machineconfigpool.machineconfiguration.openshift.io/worker       rendered-worker-cfbd41056108b83f3a52eae8c7acf303       True      False      False      2              2                   2                     0                      9d
-machineconfigpool.machineconfiguration.openshift.io/worker-cnf   rendered-worker-cnf-f1078562e383cf87e9bd4cea93efcd3c   True      False      False      0              0                   0                     0                      7d19h
+NAME                                                             CONFIG                                             UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT   UPDATEDMACHINECOUNT   DEGRADEDMACHINECOUNT   AGE
+machineconfigpool.machineconfiguration.openshift.io/master       rendered-master-2301d97983c56caa3cb1a81fd01ca987   True      False      False      3              3                   3                     0                      20h
+machineconfigpool.machineconfiguration.openshift.io/worker       rendered-worker-7f3e6ca051823c54a693c681699754b6   True      False      False      2              2                   2                     0                      20h
+machineconfigpool.machineconfiguration.openshift.io/worker-cnf                                                      False     True       False      2              0                   0                     0                      87s
 ```
 
 > :exclamation: Notice the machineconfigpool was created but there is not any node matching the role worker-cnf. This will be addressed in the configuration part.
@@ -98,10 +102,21 @@ Let's get into it.
 First thing that must be done is label the CNF capable worker nodes as role worker-cnf since the `machineconfigpool` we created during the PAO installation target them to apply the performance profile. This can be done manually or using a policy targetting one cluster at a time:
 
 ```sh
-$ oc create -f policy-label-cnf10-worker-nodes.yaml
+$ oc create -f policy-label-cnf10-worker-nodes.yaml 
+policy.policy.open-cluster-management.io/policy-clustercnf10-tag-workers created
+placementbinding.policy.open-cluster-management.io/binding-policy-clustercnf10-tag-workers created
+placementrule.apps.open-cluster-management.io/cluster-cnf10 created
 ```
 > :warning: This a very specific policy since we need to know the name of nodes in advance or get that information from ACM. Basically, applies the mentioned label to the nodes explicitly included in the policy. Also specifically targets one cluster, since usually the name of the nodes are different among clusters. 
 
+We can verify that the proper nodes are labelled accordingly by executing the following command in the imported cluster:
+
+```sh
+oc get nodes -lnode-role.kubernetes.io/worker-cnf
+NAME                                             STATUS   ROLES               AGE   VERSION
+cnf10-worker-0.dev5.kni.lab.eng.bos.redhat.com   Ready    worker,worker-cnf   19h   v1.19.0+d59ce34
+cnf11-worker-0.dev5.kni.lab.eng.bos.redhat.com   Ready    worker,worker-cnf   19h   v1.19.0+d59ce34
+```
 Next, we need to create the proper ACM manifests to tell ACM where this performance profile (configuration) is located, when it must be applied and who are the target clusters. 
 
 > :exclamation: These files are placed in the master branch since they are ACM specific. 
@@ -116,36 +131,46 @@ $ cd acm-manifests/performance-operator/stage
 Connect to the hub cluster:
 
 ```sh
-$ oc project openshift-performance-addon
+$ oc project openshift-performance-addon-operator
+
 $ oc apply -f channel-pao.yaml
+channel.apps.open-cluster-management.io/pao-channel-github created
+
 $ oc apply -f app-subs-stage.yaml
+application.app.k8s.io/pao-app-stage created
+subscription.apps.open-cluster-management.io/pao-subscription-stage created
+
 $ oc apply -f placement-stage-clusters.yaml
+placementrule.apps.open-cluster-management.io/stage-clusters created
 ```
-> :exclamation: Notice that you must have an imported cluster labelled as environment=stage to let ACM which is/are the clusters where the performance profile (configuration) must be applied.
+> :exclamation: Notice that you must have an imported cluster labelled as environment=stage to let ACM know which is/are the clusters where the performance profile (configuration) must be applied.
 
 Verify in your hub cluster that those resources are correctly created and propagated:
 
 ```sh
-$ oc get channel,application,placementrule  -n openshift-performance-addon
+$ oc get channel,application,placementrule  -n openshift-performance-addon-operator
+
 NAME                                                         TYPE   PATHNAME                                       AGE
-channel.apps.open-cluster-management.io/pao-channel-github   Git    https://github.com/alosadagrande/acm-cnf.git   8d
+channel.apps.open-cluster-management.io/pao-channel-github   Git    https://github.com/alosadagrande/acm-cnf.git   3m41s
 
 NAME                                   TYPE   VERSION   OWNER   READY   AGE
-application.app.k8s.io/pao-app-stage                                    8d
+application.app.k8s.io/pao-app-stage                                    3m12s
 
-NAME                                                                 AGE   REPLICAS
-placementrule.apps.open-cluster-management.io/placement-policy-pao   8d    
-placementrule.apps.open-cluster-management.io/stage-clusters         8d    
+NAME                                                                 AGE     REPLICAS
+placementrule.apps.open-cluster-management.io/cluster-cnf10          11m     
+placementrule.apps.open-cluster-management.io/placement-policy-pao   30m     
+placementrule.apps.open-cluster-management.io/stage-clusters         2m57s   
 ```
-> :exclamation: Notice that there are two placementrules. The one required to install PAO, whose target clusters are labelled as pao=true and the new one, which is required to apply the stage configuration to stage clusters: environment=stage
+
+> :exclamation: Notice that there are two placementrules. The one required to install PAO, whose target clusters are labelled as pao=true and the new one, which is required to apply the stage configuration to stage clusters: environment=stage. There is no need to have two, it is simply an exercise of learning. One `placementRule` might be enough for your case.
 
 Lastly we can verify that the `PerformanceProfile` manifest has been propagated correctly as well from the Git branch repository to the target clusters.
 
 ```sh
 $ oc get deployables
-NAME                                                                         TEMPLATE-KIND        TEMPLATE-APIVERSION                  AGE   STATUS
-pao-subscription-stage-deployable                                            Subscription         apps.open-cluster-management.io/v1   8d    Propagated
-pao-subscription-stage-operator-performance-performance-performanceprofile   PerformanceProfile   performance.openshift.io/v1alpha1    8d    
+NAME                                                                         TEMPLATE-KIND        TEMPLATE-APIVERSION                  AGE     STATUS
+pao-subscription-stage-deployable                                            Subscription         apps.open-cluster-management.io/v1   2m25s   Propagated
+pao-subscription-stage-operator-performance-performance-performanceprofile   PerformanceProfile   performance.openshift.io/v1alpha1    2m24s   
 ```
 
 Next, move to your **spoke** clusters where PAO configuration is targeted and notice that a new `performanceprofile` manifest is created with the same exact values as the one it is stored in the Git repository. 
@@ -153,12 +178,12 @@ Next, move to your **spoke** clusters where PAO configuration is targeted and no
 ```sh
 $ oc get performanceprofile
 NAME          AGE
-performance   7d7h
+performance   86s
 ```
 
-At this point everything is setup. However, you may notice that no changes are being made to worker nodes with role worker-cnf... there are no reboots... nothing is going on. That's because the `machineconfigpool` for worker-cnf is paused. We need to unpaused to let the Machine Config Operator to start applying the configuration to worker-cnf nodes.
+At this point everything is setup. However, you may notice that no changes are being made to worker nodes with role worker-cnf... there are no reboots... nothing is going on. That's because the `machineconfigpool` for worker-cnf is paused. We need to unpaused to let the Machine Config Operator start applying the configuration to worker-cnf nodes.
 
-Remember that the worker-cnf `machineconfigpool` is controlled by the we applied in the installation section. So, we should not change it from the spoke cluster. Actually, the policy must be edited from the hub cluster and paused must be set to false:
+Remember that the worker-cnf `machineconfigpool` is the one we applied in the installation section. So, we should not change it from the spoke cluster. Actually, the policy must be edited from the hub cluster and paused must be set to false:
 
 ```yaml
         - complianceType: musthave
