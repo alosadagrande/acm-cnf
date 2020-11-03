@@ -5,4 +5,5 @@ resources:
   - sriov-network-node-policy-netdevice.yaml
   - sriov-network.yaml
   - deployment-sriov-pod-test.yaml
-
+  - sriov-network-node-policy-netdevice-fh.yaml
+  - sriov-network-fh.yaml
