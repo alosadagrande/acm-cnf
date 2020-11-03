@@ -20,10 +20,10 @@ namespace/openshift-ptp created
 
 Then, inside the openshift-ptp namespace, apply the policy which will create both the `placementrule` and `placementrulebinding`.
 
-> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to `policy-ptp-operator.yaml` which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace `Subscription.spec.source` to redhat-operators in the policy manifest.
+> :exclamation: Here we are using the operator for OpenShift 4.6.
 
 ```sh
-$ oc create -f policy-ptp-operator-46.yaml 
+$ oc create -f policy-ptp-operator.yaml 
 policy.policy.open-cluster-management.io/policy-ptp-operator created
 placementbinding.policy.open-cluster-management.io/binding-policy-ptp created
 placementrule.apps.open-cluster-management.io/placement-policy-ptp created
@@ -40,6 +40,11 @@ policy-ptp-operator   35s
 > :warning: If you go to the spoke cluster you will notice the operator is not installed. Even the namespace was not created. That's because we forgot to label our spoke cluster in ACM to match the `placementRule` label (ptp=true)
 
 Next, let's label the imported cluster by connecting to the ACM user interface and add a label to a cluster. You can also use oc CLI and modify the proper `managedCluster` object. Remember to set label as ptp=true.
+
+```sh
+$ oc patch managedClusters cnf10 --type=merge -p '{"metadata":{"labels":{"ptp":"true"}}}'
+managedcluster.cluster.open-cluster-management.io/cnf10 patched
+```
 
 ```sh
 $ oc get managedClusters -o yaml cnf10
@@ -68,7 +73,7 @@ metadata:
 Once the spoke cluster is labelled the policy will have a target cluster to enforce it. Then check that the different objects were created successfully in the target cluster:
 
 ```sh
-$Th oc get pods,operatorgroup,subscription.operators.coreos.com,ptpoperatorconfig -n openshift-ptp
+$ oc get pods,operatorgroup,subscription.operators.coreos.com,ptpoperatorconfig -n openshift-ptp
 NAME                              READY   STATUS    RESTARTS   AGE
 pod/linuxptp-daemon-2pdvf         2/2     Running   0          10d
 pod/linuxptp-daemon-7v6rk         2/2     Running   0          9d
@@ -83,9 +88,6 @@ subscription.operators.coreos.com/ptp-operator-subscription   ptp-operator   per
 NAME                                         AGE
 ptpoperatorconfig.ptp.openshift.io/default   11d
 ```
-
-
-
 
 ## Configuration
 
