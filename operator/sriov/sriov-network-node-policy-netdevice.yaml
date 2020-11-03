@@ -2,14 +2,14 @@ apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovNetworkNodePolicy
 metadata:
   annotations:
-  name: sriov-network-node-policy
+  name: sriov-network-node-policymh
   namespace: openshift-sriov-network-operator
 spec:
   deviceType: netdevice
   isRdma: true
   nicSelector:
     pfNames:
-    - ens1f0#0
+    - eno1#0
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
   numVfs: 5
