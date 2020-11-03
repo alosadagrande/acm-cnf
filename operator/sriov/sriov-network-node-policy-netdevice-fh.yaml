@@ -2,7 +2,7 @@ apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovNetworkNodePolicy
 metadata:
   annotations:
-  name: sriov-network-node-policy-mh
+  name: sriov-network-node-policy-fh
   namespace: openshift-sriov-network-operator
 spec:
   deviceType: netdevice
