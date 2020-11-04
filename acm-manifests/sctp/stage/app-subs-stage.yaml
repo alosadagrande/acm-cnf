@@ -2,7 +2,7 @@ apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
   name: sctp-app-stage
-  namespace: sctp-gitops
+  namespace: openshift-sctp
 spec:
   componentKinds:
   - group: apps.open-cluster-management.io
@@ -19,7 +19,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
 metadata:
   name: sctp-subscription-stage
-  namespace: sctp-gitops
+  namespace: openshift-sctp
   labels:
     app: sctp-app-stage
   annotations:
@@ -27,7 +27,7 @@ metadata:
     apps.open-cluster-management.io/git-branch: stage
 spec:
   name: sctp-subscription-stage
-  channel: sctp-gitops/sctp-channel-github
+  channel: openshift-sctp/sctp-channel-github
   placement:
     placementRef:
       kind: PlacementRule

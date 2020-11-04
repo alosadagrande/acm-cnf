@@ -2,7 +2,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: stage-clusters 
-  namespace: sctp-gitops 
+  namespace: openshift-sctp 
 spec:
   clusterConditions:
   - type: ManagedClusterConditionAvailable
