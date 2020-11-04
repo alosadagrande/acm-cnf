@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - sriov-network-node-policy-netdevice.yaml
-  - sriov-network.yaml
-  - deployment-sriov-pod-test.yaml
+  - sriov-network-node-policy-netdevice-mh.yaml
   - sriov-network-node-policy-netdevice-fh.yaml
+  - sriov-network-mh.yaml
   - sriov-network-fh.yaml
+  - deployment-sriov-pod-test.yaml
