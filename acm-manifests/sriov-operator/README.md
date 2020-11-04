@@ -1,14 +1,14 @@
-# ACM & the SRIOV Network Operator
+# ACM & the SR-IOV Network Operator
 
 ## Installation
 
-The installation of SRIOV Network Operator (SRIOV Operator) is done using ACM policies which ensures the following objects exist in the spoke clusters:
+The installation of SR-IOV Network Operator (SR-IOV Operator) is done using ACM policies which ensures the following objects exist in the spoke clusters:
 
 * The namespace where the operator will be executed. Default namespace is `openshift-sriov-network-operator`
 * Operator installation by creating the `operatorgroup` and `subscription` objects.
 * The `SriovOperatorConfig` is modified so sriov-network-config-daemon daemonset only targets SRIOV capable nodes, which in our case are the node labelled as role worker-cnf.
 * Proper CNF capable nodes labelled as role worker-cnf.
-* Cluster network object is modified to add a dummy-dhcp-network required by SRIOV Network Operator.
+* Cluster network object is modified to add a dummy-dhcp-network required by SR-IOV Network Operator. This could come in handy if we want to assign IPs (L3) to pods' VFs.
 
 In order to apply the policy named **policy-sriov-operator** a `PlacementRule` is required so that we can target from all our imported clusters the ones that require this policy to be installed or said differently, the ones that requires the SRIOV operator installed. In our case we will target clusters that contain the label **sriov=true** added.
 
@@ -20,10 +20,10 @@ namespace/openshift-sriov-network-operator created
 ```
 Then, inside the openshift-sriov-network-operator namespace, apply the policy which will install the operator and also create both the `placementrule` and `placementrulebinding`.
 
-> :exclamation: Here we are using the operator for OpenShift 4.6. Since it is not released at the time of writing the Subscription object points to an internal catalogSource. You can take a look to `policy-sriov-operator.yaml` which is runnning operator 4.5 to see the differences. Just make sure once OpenShift 4.6 is GA you replace `Subscription.spec.source` to redhat-operators in the policy manifest.
+> :exclamation: At the time of writing last channel for SR-IOV operator is 4.6 since latest GA version of OpenShift is 4.6.
 
 ```sh
-$ oc create -f policy-sriov-operator-46.yaml 
+$ oc create -f policy-sriov-operator.yaml 
 policy.policy.open-cluster-management.io/policy-sriov-operator created
 placementbinding.policy.open-cluster-management.io/binding-policy-sriov created
 placementrule.apps.open-cluster-management.io/placement-policy-sriov created
@@ -98,15 +98,15 @@ sriovoperatorconfig.sriovnetwork.openshift.io/default   7m29s
 
 ## Configuration
 
-Configuration of the SRIOV Network Operator (SRIOV) is done using ACM GitOps approach. Actually, when we talk about SRIOV configuration we are referring to create or modify a couple of SRIOV related CRDs:
+Configuration of the SR-IOV Network Operator (SR-IOV) is done using ACM GitOps approach. Actually, when we talk about SR-IOV configuration we are referring to create or modify a couple of SR-IOV related CRDs:
 
-* [SRIOV Network object](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network.yaml)
-* [SRIOV Network Node Policy](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network-node-policy-netdevice.yaml)
-* Test executing a [pod](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/deployment-sriov-pod-test.yaml) requesting a VFS from a SRIOV capable node.
+* SR-IOV Network objects. In our case since we are creating two SR-IOV networks, [mid haul](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network-mh.yaml) and [front haul SR-IOV Network](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/sriov-network-fh.yaml)
+* SR-IOV Network Node Policy. We need as well to create two `SriovNetworkNodePolicies` to configure each `SriovNetwork` defined previously.
+* Test executing a [pod](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/deployment-sriov-pod-test.yaml) requesting a VFS from both SR-IOV Networks defined.
 
 > :warning: `SriovNetworkNodePolicy` must be adapted to your environment since depends on the NIC model and NIC interface you are planning to use.
 
-`SriovNetworkNodePolicy` and `SriovNetwork` are create in the hub `openshift-sriov-network-operator` namespace. They are needed to expose the SRIOV Virtual Functions (VFs) to a pod that requires SRIOV features. In our case, we are planning to deploy a test pod that will make use of the SRIOV Network defined. Basically, it is created with two interfaces leveraging Multus integration: one is connected to the OpenShift network and the other will be directly connected to a SRIOV Virtual Function (VFs) of the physical server where the pod is running.
+`SriovNetworkNodePolicy` and `SriovNetwork` are created in the hub `openshift-sriov-network-operator` namespace. They are needed to expose the SR-IOV Virtual Functions (VFs) to a pod that requires SR-IOV features. In our case, we are planning to deploy a test pod that will make use of the SR-IOV networks defined. Basically, it is a pod created with three interfaces leveraging Multus integration: one is connected to the OpenShift network and the other two will be directly connected to a SR-IOV Virtual Function (VFs) of the physical server where the pod is running.
 
 All configuration files: `SriovNetworkNodePolicy`, `SriovNetwork` and test-pod `Deployment` are stored in a Git branch in this repository. ACM is in charge of making sure the configuration stored in Git is applied properly. Therefore, in order to change any of these files on a particular environment or group of clusters, it must be done through a Git workflow.
 
@@ -114,7 +114,7 @@ Let's get into it.
 
 > :warning: If you already installed the Performance Addon Operator then you already have the worker-cnf machineConfigPool in place. Otherwise take a look to Performance Addon Operator policy where it the worker-cnf machineConfigPool is created
 
-We need to create the proper ACM manifests to tell ACM where the `ptpConfig` files are locate and which cluster will be targetted. Note that these files are placed in the master branch since they are ACM specific.
+We need to create the proper ACM manifests to tell ACM where the confguration files are locate and which cluster will be targetted. Note that these files are placed in the master branch since they are ACM specific.
 
 ```sh
 $ git checkout master
@@ -129,6 +129,8 @@ $ oc apply -f app-subs-sriov.yaml
 $ oc apply -f placement-stage-clusters.yaml
 ```
 > :exclamation: Notice that you must have an imported cluster labelled as environment=stage to let ACM which is/are the clusters where the PTP configuration files must be applied.
+
+> :exclamation: Note that the objects propagated are the ones included in the [kustomize.yaml](https://github.com/alosadagrande/acm-cnf/blob/stage/operator/sriov/kustomization.yaml) file. Feel free to add or remove objects from there depending on your needs.
 
 Verify in your hub cluster that those resources are correctly created and propagated:
 
@@ -151,15 +153,18 @@ Notice that there are two placementrules. The one required to install SR-IOV Net
 Lastly, we can verify that the SR-IOV Network and SR-IOV Network Node Policy manifests have been propagated correctly as well from the Git branch repository to the target clusters. Also, a test application is deployed to verify that SR-IOV is correctly configured.
 
 ```sh
-$ oc get deployables 
-NAME                                                                                          TEMPLATE-KIND            TEMPLATE-APIVERSION                  AGE   STATUS
-sriov-subscription-operator-deployable                                                        Subscription             apps.open-cluster-management.io/v1   11d   Propagated
-sriov-subscription-operator-operator-sriov-sriov-network-node-policy-sriovnetworknodepolicy   SriovNetworkNodePolicy   sriovnetwork.openshift.io/v1         11d   
-sriov-subscription-operator-operator-sriov-sriov-network-sriovnetwork                         SriovNetwork             sriovnetwork.openshift.io/v1         11d   
-sriov-subscription-operator-operator-sriov-sriov-pod-test-deployment                          Deployment               apps/v1                              11d   
+$ oc get deployables
+NAME                                                                                             TEMPLATE-KIND            TEMPLATE-APIVERSION                  AGE   STATUS
+sriov-subscription-operator-deployable                                                           Subscription             apps.open-cluster-management.io/v1   5s    Propagated
+sriov-subscription-operator-operator-sriov-sriov-network-fh-sriovnetwork                         SriovNetwork             sriovnetwork.openshift.io/v1         2s    
+sriov-subscription-operator-operator-sriov-sriov-network-mh-sriovnetwork                         SriovNetwork             sriovnetwork.openshift.io/v1         2s    
+sriov-subscription-operator-operator-sriov-sriov-network-node-policy-fh-sriovnetworknodepolicy   SriovNetworkNodePolicy   sriovnetwork.openshift.io/v1         2s    
+sriov-subscription-operator-operator-sriov-sriov-network-node-policy-mh-sriovnetworknodepolicy   SriovNetworkNodePolicy   sriovnetwork.openshift.io/v1         2s    
+sriov-subscription-operator-operator-sriov-sriov-pod-test-deployment                             Deployment               apps/v1                              2s 
 ```
+> :warning: Once we applied the configuration, the worker nodes will need to be configured. So probably you will see them moving from Ready to a non Ready status
 
-Next, move to your **spoke** cluster where SRIOV configuration is targeted and notice that a two SRIOV Network Policies are shown. The one called sriov-network-node-policy is the applied. See that a SRIOV Network is created along with a test pod which is in Running state. 
+Next, move to your **spoke** cluster where SR-IOV configuration is targeted and notice that a three SR-IOV Network Policies are shown. The ones called sriov-network-node-policy-mh and sriov-network-node-policy-fh are the applied ones. See that a SR-IOV Network is created along with a test pod which is in Running state. 
 
 > :exclamation: The sriov-pod-test in Running state allows us to verify quickly that the SR-IOV configuration is set up correctly.
 
@@ -168,44 +173,60 @@ Next, move to your **spoke** cluster where SRIOV configuration is targeted and n
 ```sh 
 $ oc get sriovnetworknodepolicy,sriovnetwork,deployment -n openshift-sriov-network-operator
 
-NAME                                                                         AGE
-sriovnetworknodepolicy.sriovnetwork.openshift.io/default                     11d
-sriovnetworknodepolicy.sriovnetwork.openshift.io/sriov-network-node-policy   11d
+NAME                                                                            AGE
+sriovnetworknodepolicy.sriovnetwork.openshift.io/default                        101m
+sriovnetworknodepolicy.sriovnetwork.openshift.io/sriov-network-node-policy-fh   81m
+sriovnetworknodepolicy.sriovnetwork.openshift.io/sriov-network-node-policy-mh   81m
 
-NAME                                                   AGE
-sriovnetwork.sriovnetwork.openshift.io/sriov-network   11d
+NAME                                                      AGE
+sriovnetwork.sriovnetwork.openshift.io/sriov-network-fh   81m
+sriovnetwork.sriovnetwork.openshift.io/sriov-network-mh   81m
 
 NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/sriov-network-operator   1/1     1            1           11d
-deployment.apps/sriov-pod-test           1/1     1            1           11d
+deployment.apps/sriov-network-operator   1/1     1            1           101m
+deployment.apps/sriov-pod-test           1/1     1            1           81m
 ```
 
-Finally you can verify that the test pod is connected to the host network using the SRIOV Network Virtual Function. Notice that the physical network address available is 172.22.0.0/24. See there are three interfaces: local, OpenShift network and the physical one exposed as a SRIOV VF.
+Finally, you can verify that the test pod is connected to both host networks (net1,net2) using the SR-IOV Network Virtual Function. 
 
 ```sh
-oc rsh sriov-pod-test-59cf8bdf74-927zt ip a
+ oc rsh sriov-pod-test-57b458c754-v42gp
+sh-4.2$ ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
        valid_lft forever preferred_lft forever
     inet6 ::1/128 scope host 
        valid_lft forever preferred_lft forever
-3: eth0@if69: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default 
-    link/ether 0a:58:0a:87:01:42 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 10.135.1.66/23 brd 10.135.1.255 scope global eth0
+3: eth0@if292: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UP group default 
+    link/ether 0a:58:0a:84:02:75 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.132.2.117/23 brd 10.132.3.255 scope global eth0
        valid_lft forever preferred_lft forever
-    inet6 fe80::858:aff:fe87:142/64 scope link 
+    inet6 fe80::858:aff:fe84:275/64 scope link 
        valid_lft forever preferred_lft forever
-25: net1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    link/ether f6:fa:a1:bd:70:60 brd ff:ff:ff:ff:ff:ff
-    inet 172.22.0.208/24 brd 172.22.0.255 scope global net1
+162: net2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 4e:59:29:b9:05:78 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::4c59:29ff:feb9:578/64 scope link 
        valid_lft forever preferred_lft forever
-    inet6 fe80::f4fa:a1ff:febd:7060/64 scope link 
+229: net1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether d2:0a:89:de:2c:bc brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::d00a:89ff:fede:2cbc/64 scope link 
        valid_lft forever preferred_lft forever
 ```
 
+> :exclamation: In this case there is no IP since the SR-IOV Network was set to layer-2 only. However, you can modify it to use IP (layer-3) capabilities.
 
-
-
-
-
+```sh
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetwork
+metadata:
+  name: sriov-network-mh
+  namespace: openshift-sriov-network-operator
+spec:
+  ipam: |-
+    {}
+  networkNamespace: openshift-sriov-network-operator
+  resourceName: sriovnic0
+  vlan: 101
+  capabilities: '{ "mac": true, "ips": false }'
+  ```
