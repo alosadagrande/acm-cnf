@@ -9,7 +9,7 @@ spec:
   isRdma: true
   nicSelector:
     pfNames:
-    - eno1
+    - "eno1#0-0"
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
   numVfs: 5
