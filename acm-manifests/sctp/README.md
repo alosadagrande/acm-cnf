@@ -52,7 +52,7 @@ $ cd acm-manifests/sctp/stage
 Connect to the hub cluster and create a namespace to store all the ACM manifests:
 
 ```sh
-$ oc project sctp-gitops
+$ oc create ns openshift-sctp
 $ oc create -f channel-sctp.yaml 
 $ oc create -f app-subs-stage.yaml 
 $ oc create -f placement-stage-clusters.yaml
@@ -75,7 +75,7 @@ placementrule.apps.open-cluster-management.io/stage-clusters   11d
 Lastly we can verify that the SCTP object has been propagated correctly as well from the Git branch repository to the target clusters.
 
 ```sh
-$ oc get deployable -n sctp-gitops
+$ oc get deployable -n openshift-sctp
 NAME                                                                   TEMPLATE-KIND   TEMPLATE-APIVERSION                    AGE   STATUS
 sctp-subscription-stage-deployable                                     Subscription    apps.open-cluster-management.io/v1     11d   Propagated
 sctp-subscription-stage-operator-sctp-load-sctp-module-machineconfig   MachineConfig   machineconfiguration.openshift.io/v1   11d   
