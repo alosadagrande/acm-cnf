@@ -14,7 +14,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: upgrade-cluster
+          name: upgrade-cluster-4-6-3
         spec:
           object-templates:
             - complianceType: musthave
@@ -26,6 +26,7 @@ spec:
                 spec:
                   channel: stable-4.6
                   desiredUpdate:
+                    force: false
                     version: 4.6.3
                   upstream: 'https://api.openshift.com/api/upgrades_info/v1/graph'
               remediationAction: inform

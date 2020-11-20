@@ -26,6 +26,7 @@ spec:
                 spec:
                   channel: candidate-4.6
                   desiredUpdate:
+                    force: false
                     version: 4.6.5
                   upstream: 'https://api.openshift.com/api/upgrades_info/v1/graph'
               remediationAction: inform
