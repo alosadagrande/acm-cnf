@@ -1,4 +1,6 @@
 #!/bin/bash
+export SPOKE_CLUSTER=$1
+HUB_CLUSTER=cnf20
 
 if [[ $# -ne 1 ]] ; then
     echo '[ERROR] Script expects the name of the imported cluster as argument'
@@ -6,8 +8,7 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 # HUB
-export KUBECONFIG=/home/alosadag/SYSENG/CNF/cnf20-ocp/auth/kubeconfig
-export SPOKE_CLUSTER=${1}
+export KUBECONFIG=/home/alosadag/SYSENG/CNF/${HUB_CLUSTER}-ocp/auth/kubeconfig
 envsubst < hub/spoke_definition.yaml | oc create -f -
 
 until oc get secret $SPOKE_CLUSTER-import -n $SPOKE_CLUSTER; do sleep 1; done
