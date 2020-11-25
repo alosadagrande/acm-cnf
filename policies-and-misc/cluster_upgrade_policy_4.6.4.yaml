@@ -1,7 +1,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: upgrade-cluster-stable-4-6-4
+  name: upgrade-stable-4-6-4
   namespace: default
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
@@ -14,7 +14,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: upgrade-cluster-4-6-4
+          name: upgrade-cluster-stable-4-6-4
         spec:
           object-templates:
             - complianceType: musthave
@@ -29,9 +29,9 @@ spec:
                     force: false
                     version: 4.6.4
                   upstream: 'https://api.openshift.com/api/upgrades_info/v1/graph'
-              remediationAction: enforce
+              remediationAction: inform
           severity: high
-  remediationAction: enforce
+  remediationAction: inform 
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
@@ -39,18 +39,18 @@ metadata:
   name: binding-upgrade-cluster-4-6-4
   namespace: default
 placementRef:
-  name: placement-upgrade-cluster
+  name: placement-upgrade-cluster-4-6-4
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: upgrade-cluster-stable-4-6-4
+- name: upgrade-stable-4-6-4
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-upgrade-cluster
+  name: placement-upgrade-cluster-4-6-4
   namespace: default
 spec:
   clusterConditions:
@@ -58,4 +58,12 @@ spec:
     type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-      - {key: upgrade, operator: In, values: ["yes"]}
+      - key: region
+        operator: In
+        values:
+        - us
+      - key: ocpversion
+        operator: In
+        values:
+        - 4.6.3
+

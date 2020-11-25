@@ -1,7 +1,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: upgrade-cluster-candidate-4-6-5
+  name: upgrade-candidate-4-6-5
   namespace: default
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
@@ -14,7 +14,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: upgrade-cluster
+          name: upgrade-cluster-candidate-4-6-5
         spec:
           object-templates:
             - complianceType: musthave
@@ -39,7 +39,7 @@ metadata:
   name: binding-upgrade-cluster-4-6-5
   namespace: default
 placementRef:
-  name: placement-upgrade-cluster
+  name: placement-upgrade-cluster-4-6-5
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
@@ -50,7 +50,7 @@ subjects:
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-upgrade-cluster
+  name: placement-upgrade-cluster-4-6-5
   namespace: default
 spec:
   clusterConditions:
@@ -58,4 +58,12 @@ spec:
     type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-      - {key: upgrade, operator: In, values: ["yes"]}
+      - key: region
+        operator: In
+        values:
+        - us
+      - key: ocpversion
+        operator: In
+        values:
+        - 4.6.4
+
