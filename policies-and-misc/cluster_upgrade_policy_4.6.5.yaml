@@ -68,5 +68,6 @@ spec:
         - 4.6.4
       - key: zone
         operator: In
-        values: west
+        values:
+        - west
 
