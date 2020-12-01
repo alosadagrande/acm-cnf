@@ -1,7 +1,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
-  name: upgrade_mcp_channel_gh
+  name: acm-cnf 
   namespace: default
 spec:
   type: Git
