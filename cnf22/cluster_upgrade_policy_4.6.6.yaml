@@ -2,7 +2,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: upgrade-candidate-4-6-6
-  namespace: default
+  namespace: cnf22 
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -37,9 +37,9 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
   name: binding-upgrade-cluster-4-6-6
-  namespace: default
+  namespace: cnf22 
 placementRef:
-  name: placement-upgrade-mcp
+  name: placement-upgrade-cnf22 
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:

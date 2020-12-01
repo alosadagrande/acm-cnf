@@ -3,5 +3,3 @@ kind: Kustomization
 resources:
   - cluster_upgrade_mcp.yaml
   - cluster_upgrade_policy_4.6.6.yaml
-  - placementbinding.yaml
-

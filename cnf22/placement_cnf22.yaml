@@ -1,0 +1,19 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-upgrade-cnf22
+  namespace: cnf22 
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - key: name 
+        operator: In
+        values:
+        - cnf22
+      - key: ocpversion
+        operator: In
+        values:
+        - 4.6.5
