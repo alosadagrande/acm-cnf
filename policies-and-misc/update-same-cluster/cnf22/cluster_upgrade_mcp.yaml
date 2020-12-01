@@ -71,37 +71,3 @@ spec:
                   name: worker-alone 
                 spec:
                   paused: true
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  name: binding-upgrade-mcp
-  namespace: default
-placementRef:
-  name: placement-upgrade-mcp
-  kind: PlacementRule
-  apiGroup: apps.open-cluster-management.io
-subjects:
-- name: policy-upgrade-mcp
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
----
-apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
-metadata:
-  name: placement-upgrade-mcp
-  namespace: default
-spec:
-  clusterConditions:
-  - status: "True"
-    type: ManagedClusterConditionAvailable
-  clusterSelector:
-    matchExpressions:
-      - key: name 
-        operator: In
-        values:
-        - cnf21
-      - key: ocpversion
-        operator: In
-        values:
-        - 4.6.5
