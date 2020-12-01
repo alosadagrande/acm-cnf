@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cluster_upgrade_mcp.yaml
+  - cluster_upgrade_policy_4.6.6.yaml
+  - placementbinding.yaml
+
