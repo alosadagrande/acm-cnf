@@ -70,7 +70,7 @@ spec:
                 metadata:
                   name: worker-alone 
                 spec:
-                  paused: true
+                  paused: false
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
