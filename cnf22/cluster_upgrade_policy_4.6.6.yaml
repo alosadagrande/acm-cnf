@@ -31,7 +31,7 @@ spec:
                   upstream: 'https://api.openshift.com/api/upgrades_info/v1/graph'
               remediationAction: inform
           severity: high
-  remediationAction: inform
+  remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
