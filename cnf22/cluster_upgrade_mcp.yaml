@@ -30,7 +30,7 @@ spec:
                 metadata:
                   name: master
                 spec:
-                  paused: true
+                  paused: false
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
